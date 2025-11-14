@@ -1,5 +1,6 @@
 export default async function getVenues() {
-    const response = await fetch("https://a08-venue-explorer-backend.vercel.app/api/v1/venues")
+    const baseUrl = process.env.BACKEND_URL;
+    const response = await fetch(`${baseUrl}/api/v1/venues`)
     if (!response.ok){
         throw new Error("Failed to fetch venues")
     }
