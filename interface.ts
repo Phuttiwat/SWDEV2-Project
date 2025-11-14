@@ -1,27 +1,78 @@
-interface VenueItem {
-    _id: string,
-    name: string,
-    address: string,
-    district: string,
-    province: string,
-    postalcode: string,
-    tel: string,
-    picture: string,
-    dailyrate: number,
-    __v: number,
-    id: string
-  }
-  
-  interface VenueJson {
-    success: boolean,
-    count: number,
-    pagination: Object,
-    data: VenueItem[]
-  }
 
-  interface BookingItem {
-    nameLastname: string;
-    tel: string;
-    venue: string;
-    bookDate: string;
-  }
+// Product Interfaces
+export interface Product {
+  _id: string;              // มาจาก MongoDB
+  name: string;
+  sku: string;
+  description: string;
+  category: string;
+  price: number;
+  stockQuantity: number;
+  unit: string;
+  picture: string;
+  isActive: boolean;        // มีใน schema + swagger
+
+  createdAt: string | Date; // timestamps: true
+  updatedAt: string | Date;
+
+  // virtual populate (ไม่อยู่ใน swagger, แต่ backend ใช้ได้)
+  requests?: Request[];
+}
+
+export type CreateProductPayload = {
+  name: string;
+  sku: string;
+  description: string;
+  category: string;
+  price: number;
+  stockQuantity: number;
+  unit: string;
+  picture: string;
+  isActive?: boolean; // มี default true ใน schema, เลยให้ optional
+};
+
+export type UpdateProductPayload = {
+  name?: string;
+  sku?: string;
+  description?: string;
+  category?: string;
+  price?: number;
+  stockQuantity?: number;
+  unit?: string;
+  picture?: string;
+  isActive?: boolean;
+};
+
+// Request Interfaces
+export type TransactionType = "stockIn" | "stockOut";
+
+export interface RequestItemPayload {
+  transactionDate?: string;        // "2025-11-14" (ใน schema มี default Date.now, เลยให้ optional ได้)
+  transactionType: TransactionType;
+  itemAmount: number; 
+  product_id: string;    
+}
+
+export type RequestPayload = RequestItemPayload[];
+
+export interface CreateRequestPayload {
+  transactionDate?: string | Date;  // ถ้าไม่ส่ง backend ใช้ Date.now เอง
+  transactionType: TransactionType;
+  itemAmount: number;
+  user: string;        // user ObjectId
+  product_id: string;  // product ObjectId
+}
+
+export interface UpdateRequestPayload {
+  transactionDate?: string | Date;
+  transactionType?: TransactionType;
+  itemAmount?: number;
+  user?: string;
+  product_id?: string;
+}
+
+
+
+
+
+  

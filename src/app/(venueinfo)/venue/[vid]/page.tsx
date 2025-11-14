@@ -1,38 +1,37 @@
 import Image from "next/image";
-import getVenue from "@/libs/getVenue";
-import Link from "next/link";
-export default async function VenueDetailPage({ params }: { params: Promise<{ vid: string }> }) {
+import { getProduct } from "@/libs/Product";
+
+export default async function ProductDetailPage({ params }: { params: Promise<{ vid: string }> }) {
     const { vid } = await params;
-    const venueDetail= await getVenue(vid);
+    const productDetail = await getProduct(vid);
 
     return (
         <main className="p-5">
-            <h1 className="text-center p-5 text-2xl font-bold">{venueDetail.data.name}</h1>
-        <div className="flex flex-row items-center my-5 gap-5">
-            <Image
-                src={venueDetail.data.picture}
-                alt="Venue Image"
-                width={0}
-                height={0}
-                sizes="100vw"
-                className="rounded-lg w-[30%]"
-            />
-            <div className="flex flex-col items-start gap-2">
-                <div className="text-md">Name: {venueDetail.data.name}</div>
-                <div className="text-md">Address: {venueDetail.data.address}</div>
-                <div className="text-md">District: {venueDetail.data.district}</div>
-                <div className="text-md">Province: {venueDetail.data.province}</div>
-                <div className="text-md">Postal Code: {venueDetail.data.postalcode}</div>
-                <div className="text-md">Tel: {venueDetail.data.tel}</div>
-                <div className="text-md">Daily Rate: {venueDetail.data.dailyrate}</div>
-                {/* <Link href={`/booking?id=${vid}&name=${venueDetail.data.name}`}>
-                <button className="block rounded-md bg-sky-600 hover:bg-indigo-600 px-3 py-2
-                text-white shadow-sm">
-                    Make Booking
-                </button>
-                </Link> */}
+            <h1 className="text-center p-5 text-2xl font-bold">
+                {productDetail.name}
+            </h1>
+
+            <div className="flex flex-row items-center my-5 gap-5">
+                <Image
+                    src={productDetail.picture}
+                    alt="Product Image"
+                    width={0}
+                    height={0}
+                    sizes="100vw"
+                    className="rounded-lg w-[30%]"
+                />
+
+                <div className="flex flex-col items-start gap-2">
+                    <div className="text-md">Name: {productDetail.name}</div>
+                    <div className="text-md">SKU: {productDetail.sku}</div>
+                    <div className="text-md">Description: {productDetail.description}</div>
+                    <div className="text-md">Category: {productDetail.category}</div>
+                    <div className="text-md">Price: {productDetail.price}</div>
+                    <div className="text-md">Stock Quantity: {productDetail.stockQuantity}</div>
+                    <div className="text-md">Unit: {productDetail.unit}</div>
+                    <div className="text-md">Status: {productDetail.isActive ? "Active" : "Inactive"}</div>
+                </div>
             </div>
-        </div>
         </main>
     );
 }
