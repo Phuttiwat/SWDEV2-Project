@@ -1,6 +1,9 @@
 export default async function userLogin(userEmail: string, userPassword: string) {
-    const baseUrl = process.env.BACKEND_URL;
-    const response = await fetch(`${baseUrl}/api/v1/auth/login`, {
+    const baseURL = process.env.BACKEND_URL
+    if (!baseURL) {
+        throw new Error("Backend URL is not configured")
+    }
+    const response = await fetch(`${baseURL}/api/v1/auth/login`, {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
