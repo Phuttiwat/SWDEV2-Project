@@ -1,5 +1,9 @@
 export default async function userLogin(userEmail: string, userPassword: string) {
-    const response = await fetch("https://a08-venue-explorer-backend.vercel.app/api/v1/auth/login", {
+    const baseURL = process.env.BACKEND_URL
+    if (!baseURL) {
+        throw new Error("Backend URL is not configured")
+    }
+    const response = await fetch(`${baseURL}/api/v1/auth/login`, {
         method: "POST",
         headers: {
             "Content-Type": "application/json",

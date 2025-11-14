@@ -1,13 +1,13 @@
-export default async function getUserProfile(token:string){
-
-    const response = await fetch("https://a08-venue-explorer-backend-3.vercel.app/api/v1/auth/me",{
+export default async function getUserProfile(token: string) {
+    const baseURL = process.env.BACKEND_URL
+    const response = await fetch(`${baseURL}/api/v1/auth/me`, {
         method: "GET",
-        headers:{
+        headers: {
             authorization: `Bearer ${token}`,
         }
     })
 
-    if(!response.ok){
+    if (!response.ok) {
         throw new Error("Cannot get user profile")
     }
 
