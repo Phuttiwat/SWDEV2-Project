@@ -45,13 +45,38 @@ export async function addRequest(data: CreateRequestPayload, token?: string): Pr
   if (token) {
     headers["Authorization"] = `Bearer ${token}`;
   }
-  const res = await fetch(`${baseUrl}/requests`, {
-    method: "POST",
-    headers,
-    body: JSON.stringify(data),
-  });
-  if (!res.ok) throw new Error("Failed to create request");
-  return res.json();
+  
+  try {
+    const res = await fetch(`${baseUrl}/requests`, {
+      method: "POST",
+      headers,
+      body: JSON.stringify(data),
+    });
+    
+    let responseData;
+    const contentType = res.headers.get("content-type");
+    if (contentType && contentType.includes("application/json")) {
+      responseData = await res.json();
+    } else {
+      const text = await res.text();
+      throw new Error(text || `Server returned ${res.status} ${res.statusText}`);
+    }
+    
+    if (!res.ok) {
+      const errorMessage = responseData?.error || responseData?.message || `Failed to create request (${res.status})`;
+      throw new Error(errorMessage);
+    }
+    
+    // Backend returns { success: true, data: request } or just request
+    return responseData?.data || responseData;
+  } catch (error: any) {
+    // If it's already an Error with a message, re-throw it
+    if (error instanceof Error) {
+      throw error;
+    }
+    // Otherwise, wrap it in an Error
+    throw new Error(error?.message || "Failed to create request");
+  }
 }
 
 // PUT /requests/:id

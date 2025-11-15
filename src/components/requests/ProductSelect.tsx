@@ -11,6 +11,12 @@ export default function ProductSelect({ products, value, onChange }: ProductSele
             displayEmpty
             value={value}
             onChange={(e) => onChange(e.target.value)}
+            MenuProps={{
+                container: typeof document !== "undefined" ? document.body : undefined,
+                PaperProps: {
+                    style: { zIndex: 10001 },
+                },
+            }}
         >
             <MenuItem value="" disabled>
                 <em>Select Product</em>
@@ -23,4 +29,3 @@ export default function ProductSelect({ products, value, onChange }: ProductSele
         </Select>
     );
 }
-

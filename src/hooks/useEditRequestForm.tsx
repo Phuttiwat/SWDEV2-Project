@@ -163,7 +163,7 @@ export function useEditRequestForm(requestId: string) {
             await updateRequest(requestId, requestData, token);
             
             // Success - redirect to request list
-            router.push("/myrequest");
+            router.push("/request");
         } catch (err: any) {
             setError(err.message || "Failed to update request");
         } finally {
