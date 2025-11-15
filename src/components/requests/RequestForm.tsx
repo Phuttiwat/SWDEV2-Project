@@ -19,6 +19,8 @@ export default function RequestForm({
     onProductChange,
     onItemAmountChange,
     onSubmit,
+    buttonText,
+    loadingText,
 }: RequestFormProps) {
     return (
         <div className="w-full max-w-md space-y-4">
@@ -54,6 +56,8 @@ export default function RequestForm({
             <SubmitButton
                 loading={loading}
                 onClick={onSubmit}
+                buttonText={buttonText}
+                loadingText={loadingText}
             />
         </div>
     );

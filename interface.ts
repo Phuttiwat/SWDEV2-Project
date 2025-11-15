@@ -46,15 +46,6 @@ export type UpdateProductPayload = {
 // Request Interfaces
 export type TransactionType = "stockIn" | "stockOut";
 
-export interface RequestItemPayload {
-  transactionDate?: string;        // "2025-11-14" (ใน schema มี default Date.now, เลยให้ optional ได้)
-  transactionType: TransactionType;
-  itemAmount: number; 
-  product_id: string;    
-}
-
-export type RequestPayload = RequestItemPayload[];
-
 export interface CreateRequestPayload {
   transactionDate?: string | Date;  // ถ้าไม่ส่ง backend ใช้ Date.now เอง
   transactionType: TransactionType;
@@ -107,11 +98,15 @@ export interface RequestFormProps {
   onProductChange: (value: string) => void;
   onItemAmountChange: (value: number) => void;
   onSubmit: () => void;
+  buttonText?: string;
+  loadingText?: string;
 }
 
 export interface SubmitButtonProps {
   loading: boolean;
   onClick: () => void;
+  buttonText?: string;
+  loadingText?: string;
 }
 
 export interface ErrorMessageProps {

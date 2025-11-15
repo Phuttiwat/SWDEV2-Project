@@ -2,7 +2,7 @@
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { useEditRequestForm } from "@/hooks/useEditRequestForm";
-import RequestForm from "@/components/editRequest/RequestForm";
+import RequestForm from "@/components/requests/RequestForm";
 
 export default function EditRequestPage() {
     const params = useParams();
@@ -88,6 +88,8 @@ export default function EditRequestPage() {
                 onProductChange={handleProductChange}
                 onItemAmountChange={handleItemAmountChange}
                 onSubmit={handleSubmit}
+                buttonText="Update Request"
+                loadingText="Updating..."
             />
         </main>
     );

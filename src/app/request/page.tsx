@@ -1,6 +1,6 @@
 'use client';
 import { useRequestForm } from "@/hooks/useRequestForm";
-import RequestForm from "@/components/createRequest/RequestForm";
+import RequestForm from "@/components/requests/RequestForm";
 
 export default function RequestPage() {
     const {
@@ -35,6 +35,8 @@ export default function RequestPage() {
                 onProductChange={handleProductChange}
                 onItemAmountChange={handleItemAmountChange}
                 onSubmit={handleSubmit}
+                buttonText="Create Request"
+                loadingText="Creating..."
             />
         </main>
     );
