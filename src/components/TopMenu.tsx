@@ -2,12 +2,15 @@ import Image from 'next/image'
 import TopMenuItem from './TopMenuItem'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '../app/api/auth/[...nextauth]/authOptions'
+import getUserRole from '../libs/getUserRole'
 // import { Link } from '@mui/material'
 import Link from 'next/link'
 
 export default async function TopMenu() {
 
     const session = await getServerSession(authOptions)
+    const userRole = session?.user?.token ? await getUserRole(session.user.token) : null
+    const isAdmin = userRole === 'admin'
     return (
         <div className="w-full flex items-center py-2 bg-white border-b">
             {/* Left side - Sign-In and My Booking */}
@@ -27,9 +30,9 @@ export default async function TopMenu() {
                             </Link>
                         </>
                 }
-                <Link href="/mybooking">
+                <Link href="/myrequest">
                     <div className="px-2 text-amber-700 underline cursor-pointer hover:text-amber-900">
-                        My Booking
+                        {isAdmin ? 'All Requests' : 'My Request'}
                     </div>
                 </Link>
                 <Link href="/product/add">
@@ -40,7 +43,7 @@ export default async function TopMenu() {
 
             {/* Right side - Booking menu and Logo */}
             <div className="flex items-center gap-4 ml-auto pr-8">
-                <TopMenuItem title='Booking' pageRef='/booking' />
+                {!isAdmin && <TopMenuItem title='Request' pageRef='/request' />}
                 <Link href="/">
                     <div className="relative bg-amber-50 px-4 py-2 rounded cursor-pointer">
                         <Image

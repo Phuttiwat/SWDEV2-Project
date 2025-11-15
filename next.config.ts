@@ -13,6 +13,17 @@ const nextConfig: NextConfig = {
       hostname: 'caseculture.co',
     }
   ]
+    domains: ['drive.google.com'],
+    remotePatterns: [
+    {
+      protocol: 'https',
+      hostname: 'www.google.com',
+    },
+    {
+      protocol: 'https',
+      hostname: 'caseculture.co',
+    }
+  ]
   },
   async headers() {
       return [

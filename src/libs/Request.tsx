@@ -1,6 +1,11 @@
 import { CreateRequestPayload, UpdateRequestPayload } from "../../interface";
 import { fetchWithAuth } from "./fetchWithAuth";
+import { fetchWithAuth } from "./fetchWithAuth";
 
+const baseUrl = process.env.NEXT_PUBLIC_BACKEND_URL ;
+if (!baseUrl) {
+    console.error("NEXT_PUBLIC_BACKEND_URL is not defined.");
+}
 const baseUrl = process.env.NEXT_PUBLIC_BACKEND_URL ;
 if (!baseUrl) {
     console.error("NEXT_PUBLIC_BACKEND_URL is not defined.");
@@ -9,6 +14,7 @@ if (!baseUrl) {
 // GET /requests
 export async function getRequests(): Promise<Request[]> {
   const res = await fetchWithAuth(`${baseUrl}/requests`);
+  const res = await fetchWithAuth(`${baseUrl}/requests`);
   if (!res.ok) throw new Error("Failed to fetch requests");
   return res.json();
 }
@@ -16,12 +22,14 @@ export async function getRequests(): Promise<Request[]> {
 // GET /requests/:id
 export async function getRequest(id: string): Promise<Request> {
   const res = await fetchWithAuth(`${baseUrl}/requests/${id}`);
+  const res = await fetchWithAuth(`${baseUrl}/requests/${id}`);
   if (!res.ok) throw new Error("Failed to fetch request");
   return res.json();
 }
 
 // POST /requests
 export async function addRequest(data: CreateRequestPayload): Promise<Request> {
+  const res = await fetchWithAuth(`${baseUrl}/requests`, {
   const res = await fetchWithAuth(`${baseUrl}/requests`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -37,6 +45,7 @@ export async function updateRequest(
   data: UpdateRequestPayload
 ): Promise<Request> {
   const res = await fetchWithAuth(`${baseUrl}/requests/${id}`, {
+  const res = await fetchWithAuth(`${baseUrl}/requests/${id}`, {
     method: "PUT",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(data),
@@ -47,6 +56,7 @@ export async function updateRequest(
 
 // DELETE /requests/:id
 export async function deleteRequest(id: string): Promise<{ message: string }> {
+  const res = await fetchWithAuth(`${baseUrl}/requests/${id}`, {
   const res = await fetchWithAuth(`${baseUrl}/requests/${id}`, {
     method: "DELETE",
   });

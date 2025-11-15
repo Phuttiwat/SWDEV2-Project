@@ -5,7 +5,7 @@ export default async function userRegister(
     userRole: "admin" | "staff",
     userPassword: string
 ) {
-    const baseUrl = process.env.NEXT_PUBLIC_BACKEND_URL ;
+    const baseUrl = process.env.NEXT_PUBLIC_BACKEND_URL;
     if (!baseUrl) {
         console.error("NEXT_PUBLIC_BACKEND_URL is not defined.");
     }
