@@ -25,7 +25,7 @@ export default withAuth(
         // ============================================
         
         // Routes ที่ต้องเป็น admin เท่านั้น
-        const adminRoutes = ['/admin']
+        const adminRoutes = ['/product/add']
         if (adminRoutes.some(route => path.startsWith(route))) {
             if (!token?.token) {
                 return NextResponse.redirect(new URL('/api/auth/signin', req.url))

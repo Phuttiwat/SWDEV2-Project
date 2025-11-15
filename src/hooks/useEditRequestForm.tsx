@@ -22,9 +22,13 @@ export function useEditRequestForm(requestId: string) {
     // Fetch products
     useEffect(() => {
         const fetchProducts = async () => {
+            if (!session?.user?.token) {
+                setProductsLoading(false);
+                return;
+            }
             setProductsLoading(true);
             try {
-                const response = await getProducts();
+                const response = await getProducts(session.user.token);
                 const productList = Array.isArray(response) ? response : (response?.data || []);
                 if (Array.isArray(productList)) {
                     setProducts(productList);

@@ -99,7 +99,7 @@ export default function RequestList() {
             
             console.log("Extracted ProductId:", productId, "Type:", typeof productId);
             
-            const productResponse = await getProduct(productId);
+            const productResponse = await getProduct(productId, session.user.token);
             // Backend returns { success: true, data: product } or just product
             const product = (productResponse as any)?.data || productResponse;
             const currentStock = product?.stockQuantity;

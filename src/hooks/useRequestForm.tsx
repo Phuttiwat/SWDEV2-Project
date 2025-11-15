@@ -38,9 +38,13 @@ export function useRequestForm() {
     // Fetch products
     useEffect(() => {
         const fetchProducts = async () => {
+            if (!session?.user?.token) {
+                setProductsLoading(false);
+                return;
+            }
             setProductsLoading(true);
             try {
-                const response = await getProducts();
+                const response = await getProducts(session.user.token);
                 console.log("Fetched products response:", response);
                 // Backend returns { success: true, data: products }
                 const productList = Array.isArray(response) ? response : (response?.data || []);

@@ -1,6 +1,10 @@
-import AddProductForm from "@/components/AddProductForm";
+import AddProductForm from "@/components/products/AddProductForm";
 
-export default function AddProductPage() {
+export default function AddProductPage({
+    searchParams,
+}: {
+    searchParams: { success?: string };
+}) {
     return (
         <main className="p-5">
             <h1 className="text-center text-2xl font-bold mb-6">
@@ -8,7 +12,7 @@ export default function AddProductPage() {
             </h1>
 
             <div className="flex justify-center">
-                <AddProductForm />
+                <AddProductForm searchParams={searchParams} />
             </div>
         </main>
     );

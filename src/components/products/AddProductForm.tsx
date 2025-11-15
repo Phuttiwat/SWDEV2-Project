@@ -1,5 +1,7 @@
 import { addProduct } from "@/libs/Product";
 import { redirect } from "next/navigation";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 
 async function createProduct(formData: FormData) {
   "use server"; // บอก Next ว่านี่คือ Server Action
@@ -16,11 +18,14 @@ async function createProduct(formData: FormData) {
     isActive: true,
   };
 
-  // เรียก backend ผ่าน fetchWithAuth → แนบ Authorization ให้อัตโนมัติ
-  await addProduct(payload);
+  // Get session and token
+  const session = await getServerSession(authOptions);
+  const token = session?.user?.token;
+
+  await addProduct(payload, token);
 
   // เสร็จแล้ว redirect หรือจะแสดงหน้าเดิมก็ได้
-  redirect("/add-product?success=1");
+  redirect("/product/add?success=1");
 }
 
 export default function AddProductPage({

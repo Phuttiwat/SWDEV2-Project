@@ -1,5 +1,5 @@
-import { ProductResponse } from "../../interface";
-import Card from "./Card";
+import { ProductResponse } from "../../../interface";
+import Card from "../Card";
 import Link from "next/link";
 
 import { getServerSession } from "next-auth";
@@ -13,6 +13,7 @@ export default async function ProductCatalog(props: { productsJson: ProductRespo
   // 🔐 ดึง session ฝั่ง server
   const session = await getServerSession(authOptions);
   const isAdmin = session?.user?.role === "admin"; // ถ้าเก็บ role ที่ field อื่นก็แก้ตรงนี้
+  const token = session?.user?.token;
 
   // 🗑 Server Action สำหรับลบ product
   async function deleteProductAction(formData: FormData) {
@@ -21,7 +22,11 @@ export default async function ProductCatalog(props: { productsJson: ProductRespo
     const id = formData.get("id") as string;
     if (!id) return;
 
-    await deleteProduct(id);
+    // Get session again in server action
+    const session = await getServerSession(authOptions);
+    const token = session?.user?.token;
+
+    await deleteProduct(id, token);
 
     // refresh หน้าลิสต์หลังลบ
     revalidatePath("/products"); // หรือ path ที่ใช้แสดง ProductCatalog

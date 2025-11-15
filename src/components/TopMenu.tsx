@@ -18,7 +18,7 @@ export default async function TopMenu() {
                 {
                     session ? <Link href="/api/auth/signout">
                         <div className="px-2 text-amber-700 underline cursor-pointer hover:text-amber-900">
-                            Sign-Out of {session.user?.role}</div></Link>
+                            Sign-Out of {session.user?.name}</div></Link>
                         : <>
                             <Link href="/api/auth/signin">
                                 <div className="px-2 text-amber-700 underline cursor-pointer hover:text-amber-900">
@@ -35,10 +35,12 @@ export default async function TopMenu() {
                         {isAdmin ? 'All Requests' : 'My Request'}
                     </div>
                 </Link>
-                <Link href="/product/add">
-                    <div className="px-2 text-amber-700 underline cursor-pointer hover:text-amber-900">
-                        Add Product</div>
-                </Link>
+                {
+                    isAdmin && <Link href="/product/add">
+                        <div className="px-2 text-amber-700 underline cursor-pointer hover:text-amber-900">
+                            Add Product</div>
+                    </Link>
+                }
             </div>
 
             {/* Right side - Booking menu and Logo */}
