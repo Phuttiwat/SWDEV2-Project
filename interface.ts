@@ -1,7 +1,7 @@
 
 // Product Interfaces
 export interface Product {
-  _id: string;              // มาจาก MongoDB
+  _id?: string;
   name: string;
   sku: string;
   description: string;
@@ -10,14 +10,15 @@ export interface Product {
   stockQuantity: number;
   unit: string;
   picture: string;
-  isActive: boolean;        // มีใน schema + swagger
-
-  createdAt: string | Date; // timestamps: true
-  updatedAt: string | Date;
-
-  // virtual populate (ไม่อยู่ใน swagger, แต่ backend ใช้ได้)
-  requests?: Request[];
+  isActive: boolean;
 }
+
+export interface ProductResponse {
+  success: boolean;
+  count: number;
+  data: Product[];
+}
+
 
 export type CreateProductPayload = {
   name: string;

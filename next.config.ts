@@ -2,7 +2,17 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   images: {
-    domains: ['drive.google.com']
+    domains: ['drive.google.com'],
+    remotePatterns: [
+    {
+      protocol: 'https',
+      hostname: 'www.google.com',
+    },
+    {
+      protocol: 'https',
+      hostname: 'caseculture.co',
+    }
+  ]
   },
   async headers() {
       return [

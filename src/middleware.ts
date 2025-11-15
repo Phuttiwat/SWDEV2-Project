@@ -79,7 +79,7 @@ export default withAuth(
                     '/', 
                     '/register', 
                     '/api/auth', 
-                    '/venue',
+                    '/product',
                     '/unauthorized'
                 ]
                 

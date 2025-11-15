@@ -5,11 +5,11 @@ export default async function userRegister(
     userRole: "admin" | "staff",
     userPassword: string
 ) {
-    const baseURL = process.env.BACKEND_URL
-    if (!baseURL) {
-        throw new Error("Backend URL is not configured")
+    const baseUrl = process.env.NEXT_PUBLIC_BACKEND_URL ;
+    if (!baseUrl) {
+        console.error("NEXT_PUBLIC_BACKEND_URL is not defined.");
     }
-    const response = await fetch(`${baseURL}/api/v1/auth/register`, {
+    const response = await fetch(`${baseUrl}/auth/register`, {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
