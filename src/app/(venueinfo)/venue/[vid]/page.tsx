@@ -1,6 +1,5 @@
 import Image from "next/image";
 import { getProduct } from "@/libs/Product";
-
 export default async function ProductDetailPage({ params }: { params: Promise<{ vid: string }> }) {
     const { vid } = await params;
     const productDetail = await getProduct(vid);

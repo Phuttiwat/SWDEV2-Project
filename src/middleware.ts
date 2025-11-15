@@ -1,6 +1,6 @@
 import { withAuth } from "next-auth/middleware"
 import { NextResponse } from "next/server"
-import getUserProfile from "./libs/getUserProfile"
+import getUserRole from "./libs/getUserRole"
 
 export default withAuth(
     async function middleware(req) {
@@ -10,7 +10,7 @@ export default withAuth(
         // ============================================
         // 1. Routes ที่ต้อง Login (role ใดก็ได้)
         // ============================================
-        const protectedRoutes = ['/booking', '/mybooking']
+        const protectedRoutes = ['/request', '/myrequest']
         
         if (protectedRoutes.some(route => path.startsWith(route))) {
             // เช็คว่า login แล้วหรือยัง
@@ -18,7 +18,7 @@ export default withAuth(
                 // ถ้ายังไม่ login ให้ redirect ไปหน้า signin
                 return NextResponse.redirect(new URL('/api/auth/signin', req.url))
             }
-        }
+        } 
 
         // ============================================
         // 2. Routes ที่ต้องมี Role เฉพาะ
@@ -31,38 +31,26 @@ export default withAuth(
                 return NextResponse.redirect(new URL('/api/auth/signin', req.url))
             }
             
-            try {
-                const userProfile = await getUserProfile(token.token)
-                const userRole = userProfile?.data?.role
-                
-                if (userRole !== 'admin') {
-                    // ถ้า role ไม่ใช่ admin ให้ redirect ไปหน้า unauthorized
-                    return NextResponse.redirect(new URL('/unauthorized', req.url))
-                }
-            } catch (error) {
-                // ถ้าเรียก getUserProfile ไม่ได้ ให้ redirect ไปหน้า signin
-                return NextResponse.redirect(new URL('/api/auth/signin', req.url))
+            const userRole = await getUserRole(token?.token);
+            
+            if (!userRole || userRole !== 'admin') {
+                // ถ้า role ไม่ใช่ admin ให้ redirect ไปหน้า unauthorized
+                return NextResponse.redirect(new URL('/unauthorized', req.url))
             }
         }
 
         // Routes ที่ต้องเป็น staff หรือ admin
-        const staffRoutes = ['/staff']
+        const staffRoutes = ['/request','/myrequest']
         if (staffRoutes.some(route => path.startsWith(route))) {
             if (!token?.token) {
                 return NextResponse.redirect(new URL('/api/auth/signin', req.url))
             }
             
-            try {
-                const userProfile = await getUserProfile(token.token)
-                const userRole = userProfile?.data?.role
-                
-                if (userRole !== 'staff' && userRole !== 'admin') {
-                    // ถ้า role ไม่ใช่ staff หรือ admin ให้ redirect ไปหน้า unauthorized
-                    return NextResponse.redirect(new URL('/unauthorized', req.url))
-                }
-            } catch (error) {
-                // ถ้าเรียก getUserProfile ไม่ได้ ให้ redirect ไปหน้า signin
-                return NextResponse.redirect(new URL('/api/auth/signin', req.url))
+            const userRole = await getUserRole(token?.token);
+            
+            if (!userRole || (userRole !== 'staff' && userRole !== 'admin')) {
+                // ถ้า role ไม่ใช่ staff หรือ admin ให้ redirect ไปหน้า unauthorized
+                return NextResponse.redirect(new URL('/unauthorized', req.url))
             }
         }
 
