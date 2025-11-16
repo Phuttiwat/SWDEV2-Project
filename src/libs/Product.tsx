@@ -1,6 +1,6 @@
 import { CreateProductPayload, Product, ProductResponse, UpdateProductPayload } from "../../interface";
 
-const baseUrl = process.env.NEXT_PUBLIC_BACKEND_URL ;
+const baseUrl = process.env.NEXT_PUBLIC_BACKEND_URL;
 if (!baseUrl) {
     console.error("NEXT_PUBLIC_BACKEND_URL is not defined.");
 }
@@ -23,7 +23,7 @@ export async function getProducts(token?: string): Promise<ProductResponse> {
 
 
 // GET /products/:id
-export async function getProduct(id: string, token?: string): Promise<Product> {
+export async function getProductById(id: string, token?: string): Promise<Product> {
   const headers: HeadersInit = {};
   if (token) {
     headers["Authorization"] = `Bearer ${token}`;
@@ -36,19 +36,53 @@ export async function getProduct(id: string, token?: string): Promise<Product> {
 }
 
 // POST /products
-export async function addProduct(data: CreateProductPayload, token?: string): Promise<Product> {
-  const headers: HeadersInit = { "Content-Type": "application/json" };
-  if (token) {
-    headers["Authorization"] = `Bearer ${token}`;
-  }
-  const res = await fetch(`${baseUrl}/products`, {
+export async function addProduct(data: any, token?: string) {
+  const url = `${baseUrl}/products`; // สมมติใช้แบบนี้
+  console.log("📡 POST URL:", url);
+  console.log("📦 Payload sent:", data);
+  console.log("🔑 Token:", token);
+
+  const res = await fetch(url, {
     method: "POST",
-    headers,
+    headers: {
+      "Content-Type": "application/json",
+      ...(token && { Authorization: `Bearer ${token}` }),
+    },
     body: JSON.stringify(data),
   });
-  if (!res.ok) throw new Error("Failed to add product");
+
+  if (!res.ok) {
+    let bodyText: string | undefined;
+    let bodyJson: any | undefined;
+
+    try {
+      // ลอง parse เป็น JSON ก่อน
+      bodyJson = await res.json();
+    } catch {
+      // ถ้าไม่ใช่ JSON ค่อย fallback เป็น text
+      bodyText = await res.text();
+    }
+
+    console.error("❌ Add product failed");
+    console.error("Status:", res.status, res.statusText);
+    if (bodyJson) {
+      console.error("Response JSON:", bodyJson);
+    }
+    if (bodyText) {
+      console.error("Response text:", bodyText);
+    }
+    console.error("Payload sent:", data);
+
+    throw new Error(
+      `Failed to add product: ${res.status} ${res.statusText} ${
+        bodyJson?.message || bodyText || ""
+      }`
+    );
+  }
+
   return res.json();
 }
+
 
 // PUT /products/:id
 export async function updateProduct(

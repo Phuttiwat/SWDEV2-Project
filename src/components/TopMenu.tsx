@@ -50,11 +50,10 @@ export default async function TopMenu() {
                     )
                 }
                 {
-                    isAdmin && (
-                        <Link href="/product/add" className="bg-green-50 px-4 py-2 rounded text-center hover:bg-green-100 transition-all duration-200 border border-green-200 hover:border-green-300 hover:shadow-sm">
-                            <div className="font-semibold text-green-700">Add Product</div>
-                        </Link>
-                    )
+                    isAdmin && <Link href="/product/manage">
+                        <div className="px-2 text-amber-700 underline cursor-pointer hover:text-amber-900">
+                            Add Product</div>
+                    </Link>
                 }
             </div>
         </div>
