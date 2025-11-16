@@ -1,5 +1,5 @@
 import Image from "next/image";
-import { getProduct } from "@/libs/Product";
+import { getProductById } from "@/libs/Product";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 
@@ -7,7 +7,7 @@ export default async function ProductDetailPage({ params }: { params: Promise<{ 
     const { vid } = await params;
     const session = await getServerSession(authOptions);
     const token = session?.user?.token;
-    const productDetail = await getProduct(vid, token);
+    const productDetail = await getProductById(vid, token);
 
 
     return (
