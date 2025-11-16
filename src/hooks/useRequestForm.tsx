@@ -6,7 +6,7 @@ import { Product, CreateRequestPayload, TransactionType } from "../../interface"
 
 const STORAGE_KEY = "requestFormState";
 
-export function useRequestForm() {
+export function useRequestForm(onSuccess?: () => void) {
     const { data: session } = useSession();
     
     // Load initial state from localStorage
@@ -144,6 +144,7 @@ export function useRequestForm() {
         }
 
         setLoading(true);
+        setError(""); // Clear any previous errors
         try {
             const requestData: CreateRequestPayload = {
                 transactionType: transactionType,
@@ -153,7 +154,9 @@ export function useRequestForm() {
             };
 
             const token = session.user.token;
+            console.log("Creating request with data:", requestData);
             const result = await addRequest(requestData, token);
+            console.log("Request created successfully:", result);
             
             // Clear saved state from localStorage
             if (typeof window !== "undefined") {
@@ -168,8 +171,15 @@ export function useRequestForm() {
             setProductId("");
             setItemAmount(0);
             setSelectedProduct(null);
+            
+            // Call success callback if provided
+            if (onSuccess) {
+                onSuccess();
+            }
         } catch (err: any) {
-            setError(err.message || "Failed to create request");
+            console.error("Error creating request:", err);
+            const errorMessage = err.message || "Failed to create request";
+            setError(errorMessage);
         } finally {
             setLoading(false);
         }
