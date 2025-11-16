@@ -10,15 +10,13 @@ export default function Card({
     imgSrc, 
     onRatingChange, 
     initialRating = 0,
-    deleteButton,
-    editButton
+    actionButtons,
 }: {
     venueName: string, 
     imgSrc: string, 
     onRatingChange?: (venueName: string, rating: number) => void, 
     initialRating?: number,
-    deleteButton?: React.ReactNode,
-    editButton?: React.ReactNode
+    actionButtons: React.ReactNode
 }) {
     const [rating, setRating] = useState<number>(initialRating);
 
@@ -63,18 +61,7 @@ export default function Card({
                     }
                 </div>
                 
-                <div className="flex gap-2">
-                    {editButton && (
-                        <div onClick={(e) => e.stopPropagation()}>
-                            {editButton}
-                        </div>
-                    )}
-                    {deleteButton && (
-                        <div onClick={(e) => e.stopPropagation()}>
-                            {deleteButton}
-                        </div>
-                    )}
-                </div>
+                <div className="mt-3">{actionButtons}</div>
             </div>
         </InteractiveCard>
     );

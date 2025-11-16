@@ -3,7 +3,7 @@
 import { useState, useEffect, useMemo } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import { getRequests, deleteRequest } from "@/libs/Request";
+import { getRequests, deleteRequest, getRequest } from "@/libs/Request";
 import { getProductById, updateStock } from "@/libs/Product";
 import getUserRole from "@/libs/getUserRole";
 import { Request } from "../../../interface";
@@ -125,7 +125,7 @@ export default function RequestList({ onEditClick, sortOrder = 'newest' }: Props
             }
 
             console.log("Extracted ProductId:", productId, "Type:", typeof productId);
-
+            
             const productResponse = await getProductById(productId, session.user.token);
             // Backend returns { success: true, data: product } or just product
             const product = (productResponse as any)?.data || productResponse;
