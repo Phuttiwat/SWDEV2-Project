@@ -1,6 +1,6 @@
 // components/requests/RequestList.tsx
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { getRequests, deleteRequest } from "@/libs/Request";
@@ -10,9 +10,10 @@ import { Request } from "../../../interface";
 
 type Props = {
     onEditClick?: (id: string) => void;
+    sortOrder?: 'newest' | 'oldest';
 };
 
-export default function RequestList({ onEditClick }: Props) {
+export default function RequestList({ onEditClick, sortOrder = 'newest' }: Props) {
     const { data: session } = useSession();
     const router = useRouter();
     const [requests, setRequests] = useState<Request[]>([]);
@@ -62,6 +63,22 @@ export default function RequestList({ onEditClick }: Props) {
 
         fetchRequests();
     }, [session]);
+
+    // Sort requests based on sortOrder (memoized for performance)
+    const sortedRequests = useMemo(() => {
+        return [...requests].sort((a, b) => {
+            const dateA = new Date(a.transactionDate).getTime();
+            const dateB = new Date(b.transactionDate).getTime();
+            
+            if (sortOrder === 'newest') {
+                // Newest first: descending order
+                return dateB - dateA;
+            } else {
+                // Oldest first: ascending order
+                return dateA - dateB;
+            }
+        });
+    }, [requests, sortOrder]);
 
     // handleEdit now prefers onEditClick prop, fallback to router.push
     const handleEdit = (requestId: string) => {
@@ -208,7 +225,7 @@ export default function RequestList({ onEditClick }: Props) {
 
     return (
         <div>
-            {requests.map((request) => {
+            {sortedRequests.map((request) => {
                 const product = typeof request.product_id === 'object'
                     ? request.product_id
                     : null;

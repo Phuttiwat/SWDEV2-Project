@@ -12,18 +12,18 @@ export default async function TopMenu() {
     const userRole = session?.user?.token ? await getUserRole(session.user.token) : null
     const isAdmin = userRole === 'admin'
     return (
-        <div className="w-full flex items-center py-2 bg-white border-b">
+        <div className="w-full flex items-center bg-white border-b py-2">
             {/* Left side - Logo, Request, and Products */}
             <div className="flex items-center gap-4 pl-8">
-                <Link href="/">
-                    <div className="relative bg-amber-50 px-4 py-2 rounded cursor-pointer">
+                <Link href="/" className="flex items-center">
+                    <div className="bg-white flex items-center cursor-pointer px-2">
                         <Image
-                            src={'/img/logo.png'}
-                            className="h-12 w-auto object-contain drop-shadow-sm hover:scale-105 transition-transform duration-200"
-                            alt='logo'
-                            width={0}
-                            height={0}
-                            sizes='100px'
+                            src="/img/logo.png"
+                            alt="logo"
+                            width={100}
+                            height={20}
+                            className="object-contain drop-shadow-sm hover:scale-105 transition-transform duration-200"
+                            priority
                         />
                     </div>
                 </Link>

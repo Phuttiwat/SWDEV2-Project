@@ -15,6 +15,7 @@ export default function RequestPage() {
     const [isEditOpen, setIsEditOpen] = useState(false);
     const [selectedEditId, setSelectedEditId] = useState<string | null>(null);
     const [refreshKey, setRefreshKey] = useState(0);
+    const [sortOrder, setSortOrder] = useState<'newest' | 'oldest'>('newest'); // default: newest first
 
     const [mounted, setMounted] = useState(false);
     const modalRootRef = useRef<HTMLElement | null>(null);
@@ -87,24 +88,39 @@ export default function RequestPage() {
     // helper: only show create button to staff
     const canCreate = userRole === 'staff';
 
+    const handleSortToggle = () => {
+        setSortOrder(prev => prev === 'newest' ? 'oldest' : 'newest');
+    };
+
     return (
         <main className="w-full flex flex-col space-y-6 p-8">
             <div className="flex items-center justify-between gap-4">
                 <div className="text-2xl font-semibold text-gray-800">Requests</div>
 
-                {/* Create button: compact size, only visible to staff */}
-                {canCreate && (
+                <div className="flex items-center gap-3">
+                    {/* Sort toggle button */}
                     <button
-                        onClick={() => setIsCreateOpen(true)}
-                        className="inline-flex items-center justify-center rounded-md bg-blue-500 hover:bg-blue-600 px-3 py-1 text-white shadow-md font-semibold text-sm h-8"
+                        onClick={handleSortToggle}
+                        className="inline-flex items-center justify-center rounded-md bg-gray-200 hover:bg-gray-600 px-3 py-1 text-black hover:text-white shadow-md font-semibold text-sm h-8"
+                        title={sortOrder === 'newest' ? 'Sort: Newest First' : 'Sort: Oldest First'}
                     >
-                        Create Request
+                        {sortOrder === 'newest' ? '↓ Newest' : '↑ Oldest'}
                     </button>
-                )}
+
+                    {/* Create button: compact size, only visible to staff */}
+                    {canCreate && (
+                        <button
+                            onClick={() => setIsCreateOpen(true)}
+                            className="inline-flex items-center justify-center rounded-md bg-blue-500 hover:bg-blue-600 px-3 py-1 text-white shadow-md font-semibold text-sm h-8"
+                        >
+                            Create Request
+                        </button>
+                    )}
+                </div>
             </div>
 
-            {/* Pass onEditClick to RequestList */}
-            <RequestList key={refreshKey} onEditClick={handleOpenEdit} />
+            {/* Pass onEditClick and sortOrder to RequestList */}
+            <RequestList key={refreshKey} onEditClick={handleOpenEdit} sortOrder={sortOrder} />
 
             {/* Create Modal */}
             {mounted && isCreateOpen && modalRoot && createPortal(
