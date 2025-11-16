@@ -36,7 +36,7 @@ export default async function TopMenu() {
                     </div>
                 </Link>
                 {
-                    isAdmin && <Link href="/product/add">
+                    isAdmin && <Link href="/product/manage">
                         <div className="px-2 text-amber-700 underline cursor-pointer hover:text-amber-900">
                             Add Product</div>
                     </Link>
