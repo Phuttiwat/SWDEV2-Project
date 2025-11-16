@@ -23,7 +23,7 @@ export async function getProducts(token?: string): Promise<ProductResponse> {
 
 
 // GET /products/:id
-export async function getProductById(id: string, token?: string): Promise<Product> {
+export async function getProductById(id: string, token?: string): Promise<ProductResponse> {
   const headers: HeadersInit = {};
   if (token) {
     headers["Authorization"] = `Bearer ${token}`;

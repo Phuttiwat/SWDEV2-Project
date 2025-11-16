@@ -1,23 +1,20 @@
 import { handleSubmitProduct } from "@/libs/action";
+import { Product } from "../../../interface";
 
 type AddProductFormProps = {
-  searchParams: { success?: string };
+  product?: Product | null;
 };
 
-export default function AddProductForm({ searchParams }: AddProductFormProps) {
-  const isSuccess = searchParams?.success === "1";
+export default function AddProductForm({ product }: AddProductFormProps) {
+  const isEdit = Boolean(product?._id);
+  console.log("Rendering AddProductForm with product:", product);
 
   return (
     <div className="w-full max-w-xl">
-      {isSuccess && (
-        <div className="mb-6 rounded-md border border-green-300 bg-green-100 px-4 py-3 text-green-800">
-          ✅ เพิ่มสินค้าสำเร็จแล้ว
-        </div>
-      )}
-
       <form action={handleSubmitProduct} className="space-y-5">
-        {/* ตอนนี้หน้า /product/add ใช้เพื่อ ADD อย่างเดียว
-            ถ้าอยากรองรับ edit ด้วย หน้าอื่นค่อยส่ง <input hidden id> เข้ามา */}
+        {isEdit && product?._id && (
+          <input type="hidden" name="id" value={String(product._id)} />
+        )}
 
         {/* Name */}
         <div>
@@ -28,6 +25,7 @@ export default function AddProductForm({ searchParams }: AddProductFormProps) {
             id="name"
             name="name"
             required
+            defaultValue={product?.name ?? ""}
             className="w-full rounded-md border px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
             placeholder="เช่น Nike Air Force 1"
           />
@@ -42,6 +40,7 @@ export default function AddProductForm({ searchParams }: AddProductFormProps) {
             id="sku"
             name="sku"
             required
+            defaultValue={product?.sku ?? ""}
             className="w-full rounded-md border px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
             placeholder="เช่น PROD-001"
           />
@@ -55,6 +54,7 @@ export default function AddProductForm({ searchParams }: AddProductFormProps) {
           <input
             id="category"
             name="category"
+            defaultValue={product?.category ?? ""}
             className="w-full rounded-md border px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
             placeholder="เช่น Shoes, Bag, Accessories"
           />
@@ -73,6 +73,7 @@ export default function AddProductForm({ searchParams }: AddProductFormProps) {
               step="0.01"
               min="0"
               required
+              defaultValue={product?.price ?? ""}
               className="w-full rounded-md border px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
               placeholder="1990"
             />
@@ -91,6 +92,7 @@ export default function AddProductForm({ searchParams }: AddProductFormProps) {
               type="number"
               min="0"
               required
+              defaultValue={product?.stockQuantity ?? ""}
               className="w-full rounded-md border px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
               placeholder="10"
             />
@@ -105,6 +107,7 @@ export default function AddProductForm({ searchParams }: AddProductFormProps) {
           <input
             id="unit"
             name="unit"
+            defaultValue={product?.unit ?? ""}
             className="w-full rounded-md border px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
             placeholder="pcs, pair, box"
           />
@@ -118,6 +121,7 @@ export default function AddProductForm({ searchParams }: AddProductFormProps) {
           <input
             id="picture"
             name="picture"
+            defaultValue={product?.picture ?? ""}
             className="w-full rounded-md border px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
             placeholder="https://..."
           />
@@ -135,6 +139,7 @@ export default function AddProductForm({ searchParams }: AddProductFormProps) {
             id="description"
             name="description"
             rows={4}
+            defaultValue={product?.description ?? ""}
             className="w-full rounded-md border px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
             placeholder="รายละเอียดสินค้า..."
           />
@@ -145,7 +150,7 @@ export default function AddProductForm({ searchParams }: AddProductFormProps) {
             type="submit"
             className="w-full rounded-md bg-indigo-600 px-4 py-2 text-white font-medium hover:bg-indigo-700 transition"
           >
-            Save Product
+            {isEdit ? "Update Product" : "Save Product"}
           </button>
         </div>
       </form>
