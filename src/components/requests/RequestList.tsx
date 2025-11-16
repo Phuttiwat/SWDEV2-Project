@@ -1,5 +1,6 @@
+// components/requests/RequestList.tsx
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { getRequests, deleteRequest, getRequest } from "@/libs/Request";
@@ -7,7 +8,12 @@ import { getProductById, updateStock } from "@/libs/Product";
 import getUserRole from "@/libs/getUserRole";
 import { Request } from "../../../interface";
 
-export default function RequestList() {
+type Props = {
+    onEditClick?: (id: string) => void;
+    sortOrder?: 'newest' | 'oldest';
+};
+
+export default function RequestList({ onEditClick, sortOrder = 'newest' }: Props) {
     const { data: session } = useSession();
     const router = useRouter();
     const [requests, setRequests] = useState<Request[]>([]);
@@ -43,8 +49,8 @@ export default function RequestList() {
             try {
                 const response = await getRequests(session.user.token);
                 // Backend returns { success: true, data: requests } or just requests array
-                const requestsData = Array.isArray(response) 
-                    ? response 
+                const requestsData = Array.isArray(response)
+                    ? response
                     : (response as any)?.data || [];
                 setRequests(requestsData);
             } catch (err: any) {
@@ -58,7 +64,28 @@ export default function RequestList() {
         fetchRequests();
     }, [session]);
 
+    // Sort requests based on sortOrder (memoized for performance)
+    const sortedRequests = useMemo(() => {
+        return [...requests].sort((a, b) => {
+            const dateA = new Date(a.transactionDate).getTime();
+            const dateB = new Date(b.transactionDate).getTime();
+            
+            if (sortOrder === 'newest') {
+                // Newest first: descending order
+                return dateB - dateA;
+            } else {
+                // Oldest first: ascending order
+                return dateA - dateB;
+            }
+        });
+    }, [requests, sortOrder]);
+
+    // handleEdit now prefers onEditClick prop, fallback to router.push
     const handleEdit = (requestId: string) => {
+        if (onEditClick) {
+            onEditClick(requestId);
+            return;
+        }
         router.push(`/request/${requestId}`);
     };
 
@@ -71,45 +98,45 @@ export default function RequestList() {
         try {
             // 1. หา request จาก list ที่มีอยู่แล้ว (มี product_id populated)
             const request = requests.find(req => req._id === requestId);
-            
+
             if (!request) {
                 setError("Request not found in current list");
                 return;
             }
-            
+
             console.log("Request from list:", request);
             console.log("Request product_id:", request.product_id, "Type:", typeof request.product_id);
-            
+
             // 2. ดึง product data เพื่อดู stockQuantity ปัจจุบัน
             let productId: string | undefined;
-            
+
             if (request.product_id) {
-                if (typeof request.product_id === 'object' && request.product_id._id) {
-                    productId = request.product_id._id;
+                if (typeof request.product_id === 'object' && (request.product_id as any)._id) {
+                    productId = (request.product_id as any)._id;
                 } else if (typeof request.product_id === 'string') {
                     productId = request.product_id;
                 }
             }
-            
+
             if (!productId || productId === 'undefined' || productId === 'null') {
                 console.error("Invalid productId:", productId, "Request:", request);
                 setError("Product ID not found in request");
                 return;
             }
-            
+
             console.log("Extracted ProductId:", productId, "Type:", typeof productId);
             
             const productResponse = await getProductById(productId, session.user.token);
             // Backend returns { success: true, data: product } or just product
             const product = (productResponse as any)?.data || productResponse;
             const currentStock = product?.stockQuantity;
-            
+
             if (currentStock === undefined || currentStock === null) {
                 console.error("Invalid stock quantity:", currentStock, "Product:", product);
                 setError("Failed to get current stock quantity");
                 return;
             }
-            
+
             console.log("Current stock:", currentStock);
 
             // 3. คำนวณ stockQuantity ใหม่
@@ -145,7 +172,7 @@ export default function RequestList() {
             await deleteRequest(requestId, session.user.token);
 
             // 7. อัพเดต local state (ลบ request ออกจาก list)
-            setRequests(requests.filter(req => req._id !== requestId));
+            setRequests(prev => prev.filter(req => req._id !== requestId));
         } catch (err: any) {
             console.error("Failed to approve request:", err);
             setError(err.message || "Failed to approve request");
@@ -165,7 +192,7 @@ export default function RequestList() {
         try {
             await deleteRequest(requestId, session.user.token);
             // Remove from local state
-            setRequests(requests.filter(req => req._id !== requestId));
+            setRequests(prev => prev.filter(req => req._id !== requestId));
         } catch (err: any) {
             console.error("Failed to delete request:", err);
             setError(err.message || "Failed to delete request");
@@ -195,22 +222,22 @@ export default function RequestList() {
             </div>
         );
     }
-    
+
     return (
         <div>
-            {requests.map((request) => {
-                const product = typeof request.product_id === 'object' 
-                    ? request.product_id 
+            {sortedRequests.map((request) => {
+                const product = typeof request.product_id === 'object'
+                    ? request.product_id
                     : null;
-                const user = typeof request.user === 'object' 
-                    ? request.user 
+                const user = typeof request.user === 'object'
+                    ? request.user
                     : null;
                 const transactionDate = new Date(request.transactionDate).toLocaleDateString();
                 const isStockOut = request.transactionType === 'stockOut';
                 const cardBgColor = isStockOut ? 'bg-red-50' : 'bg-slate-200';
 
                 return (
-                    <div 
+                    <div
                         className={`${cardBgColor} rounded px-5 mx-5 py-2 my-2`}
                         key={request._id}
                     >
@@ -261,4 +288,3 @@ export default function RequestList() {
         </div>
     );
 }
-
