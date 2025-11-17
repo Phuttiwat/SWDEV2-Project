@@ -10,13 +10,13 @@ export default withAuth(
         // ============================================
         // 1. Routes ที่ต้อง Login (role ใดก็ได้)
         // ============================================
-        const protectedRoutes = ['/request']
+        const protectedRoutes = ['/request', '/product/manage']
         
         if (protectedRoutes.some(route => path.startsWith(route))) {
             // เช็คว่า login แล้วหรือยัง
             if (!token) {
-                // ถ้ายังไม่ login ให้ redirect ไปหน้า signin
-                return NextResponse.redirect(new URL('/api/auth/signin', req.url))
+                // ถ้ายังไม่ login ให้ redirect ไปหน้า login
+                return NextResponse.redirect(new URL('/login', req.url))
             }
         } 
 
@@ -25,10 +25,10 @@ export default withAuth(
         // ============================================
         
         // Routes ที่ต้องเป็น admin เท่านั้น
-        const adminRoutes = ['/product/add']
+        const adminRoutes = ['/product/manage']
         if (adminRoutes.some(route => path.startsWith(route))) {
             if (!token?.token) {
-                return NextResponse.redirect(new URL('/api/auth/signin', req.url))
+                return NextResponse.redirect(new URL('/login', req.url))
             }
             
             try {
@@ -40,8 +40,8 @@ export default withAuth(
                 }
             } catch (error) {
                 console.error("Error fetching user role in middleware:", error);
-                // ถ้าเกิด error ให้ redirect ไปหน้า signin
-                return NextResponse.redirect(new URL('/api/auth/signin', req.url))
+                // ถ้าเกิด error ให้ redirect ไปหน้า login
+                return NextResponse.redirect(new URL('/login', req.url))
             }
         }
 
@@ -49,7 +49,7 @@ export default withAuth(
         const staffRoutes = ['/staff']
         if (staffRoutes.some(route => path.startsWith(route))) {
             if (!token?.token) {
-                return NextResponse.redirect(new URL('/api/auth/signin', req.url))
+                return NextResponse.redirect(new URL('/login', req.url))
             }
             
             try {
@@ -61,8 +61,8 @@ export default withAuth(
                 }
             } catch (error) {
                 console.error("Error fetching user role in middleware:", error);
-                // ถ้าเกิด error ให้ redirect ไปหน้า signin
-                return NextResponse.redirect(new URL('/api/auth/signin', req.url))
+                // ถ้าเกิด error ให้ redirect ไปหน้า login
+                return NextResponse.redirect(new URL('/login', req.url))
             }
         }
 
@@ -78,6 +78,7 @@ export default withAuth(
                 const publicRoutes = [
                     '/', 
                     '/register', 
+                    '/login',
                     '/api/auth', 
                     '/product',
                     '/unauthorized'

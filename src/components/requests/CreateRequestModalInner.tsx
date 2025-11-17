@@ -22,6 +22,7 @@ export default function CreateRequestModalInner({ modalRoot, onClose, onSuccess 
         transactionType,
         productId,
         itemAmount,
+        transactionDate,
         products,
         selectedProduct,
         loading,
@@ -30,6 +31,7 @@ export default function CreateRequestModalInner({ modalRoot, onClose, onSuccess 
         handleTransactionTypeChange,
         handleProductChange,
         handleItemAmountChange,
+        handleTransactionDateChange,
         handleSubmit,
     } = useRequestForm(handleCreateSuccess);
 
@@ -61,6 +63,7 @@ export default function CreateRequestModalInner({ modalRoot, onClose, onSuccess 
                     transactionType={transactionType}
                     productId={productId}
                     itemAmount={itemAmount}
+                    transactionDate={transactionDate}
                     products={products}
                     selectedProduct={selectedProduct}
                     loading={loading}
@@ -69,8 +72,9 @@ export default function CreateRequestModalInner({ modalRoot, onClose, onSuccess 
                     onTransactionTypeChange={handleTransactionTypeChange}
                     onProductChange={handleProductChange}
                     onItemAmountChange={handleItemAmountChange}
+                    onTransactionDateChange={handleTransactionDateChange}
                     onSubmit={handleSubmit}
-                    buttonText="Create Request"
+                    buttonText="Create"
                     loadingText="Creating..."
                 />
             </div>

@@ -19,7 +19,7 @@ export default function Unauthorized() {
                         Go Home
                     </Link>
                     <Link 
-                        href="/api/auth/signin"
+                        href="/login"
                         className="px-6 py-3 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors"
                     >
                         Sign In

@@ -5,6 +5,7 @@ import { authOptions } from '../app/api/auth/[...nextauth]/authOptions'
 import getUserRole from '../libs/getUserRole'
 // import { Link } from '@mui/material'
 import Link from 'next/link'
+import SignOutButton from './SignOutButton'
 
 export default async function TopMenu() {
 
@@ -12,50 +13,75 @@ export default async function TopMenu() {
     const userRole = session?.user?.token ? await getUserRole(session.user.token) : null
     const isAdmin = userRole === 'admin'
     return (
-        <div className="w-full flex items-center bg-white border-b py-2">
-            {/* Left side - Logo, Request, and Products */}
-            <div className="flex items-center gap-4 pl-8">
-                <Link href="/" className="flex items-center">
-                    <div className="bg-white flex items-center cursor-pointer px-2">
+        <div className="w-full bg-white relative">
+            <div className="w-full flex items-center justify-between px-6 py-3 max-w-[1920px] mx-auto">
+                {/* Left side - Logo */}
+                <div className="flex items-center">
+                    <Link href="/" className="flex items-center mr-8">
                         <Image
                             src="/img/logo.png"
                             alt="logo"
                             width={100}
                             height={20}
-                            className="object-contain drop-shadow-sm hover:scale-105 transition-transform duration-200"
+                            className="object-contain"
                             priority
                         />
-                    </div>
-                </Link>
-                <TopMenuItem title='Request' pageRef='/request' />
-                <TopMenuItem title='Products' pageRef='/product' />
-            </div>
-
-            {/* Right side - Sign-In, Register, My Request, Add Product */}
-            <div className="flex items-center gap-4 ml-auto pr-8">
-                {
-                    session ? (
-                        <Link href="/api/auth/signout" className="bg-red-500 px-4 py-2 rounded text-center hover:bg-red-600 transition-all duration-200 shadow-sm hover:shadow-md">
-                            <div className="font-semibold text-white">Sign-Out of {session.user?.name}</div>
-                        </Link>
-                    ) : (
-                        <>
-                                <Link href="/api/auth/signin" className="bg-green-500 px-4 py-2 rounded text-center hover:bg-green-600 transition-all duration-200 shadow-sm hover:shadow-md">
-                                <div className="font-semibold text-white">Sign-In</div>
-                            </Link>
-                            <Link href="/register" className="bg-blue-500 px-4 py-2 rounded text-center hover:bg-blue-600 transition-all duration-200 shadow-sm hover:shadow-md">
-                                <div className="font-semibold text-white">Register</div>
-                            </Link>
-                        </>
-                    )
-                }
-                {
-                    isAdmin && <Link href="/product/manage">
-                        <div className="px-2 text-amber-700 underline cursor-pointer hover:text-amber-900">
-                            Add Product</div>
                     </Link>
-                }
+                    
+                    {/* Navigation Links */}
+                    <nav className="flex items-center gap-6">
+                        <Link 
+                            href="/product" 
+                            className="text-[#232f3e] text-sm font-normal hover:text-[#ff9900] transition-colors"
+                        >
+                            Products
+                        </Link>
+                        <div className="h-4 w-px bg-gray-300"></div>
+                        <Link 
+                            href="/request" 
+                            className="text-[#232f3e] text-sm font-normal hover:text-[#ff9900] transition-colors"
+                        >
+                            Request
+                        </Link>
+                    </nav>
+                </div>
+
+                {/* Right side - Actions */}
+                <div className="flex items-center gap-4">
+                    {
+                        isAdmin && (
+                            <Link 
+                                href="/product/manage" 
+                                className="text-[#232f3e] text-sm font-normal hover:text-[#ff9900] transition-colors"
+                            >
+                                Add Product
+                            </Link>
+                        )
+                    }
+                    {
+                        session ? (
+                            <SignOutButton userName={session.user?.name || 'User'} />
+                        ) : (
+                            <>
+                                <Link 
+                                    href="/login" 
+                                    className="text-[#232f3e] text-sm font-normal hover:text-[#ff9900] transition-colors"
+                                >
+                                    Sign in
+                                </Link>
+                                <Link 
+                                    href="/register" 
+                                    className="bg-[#232f3e] text-white px-4 py-2 rounded-full text-sm font-normal hover:bg-[#37475a] transition-colors"
+                                >
+                                    Create account
+                                </Link>
+                            </>
+                        )
+                    }
+                </div>
             </div>
+            {/* Bottom border line - AWS style */}
+            <div className="h-[2px] bg-[#146eb4] w-full"></div>
         </div>
     )
 }

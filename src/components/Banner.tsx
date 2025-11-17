@@ -12,7 +12,7 @@ export default function Banner() {
 
     return (
         <div
-            className="relative w-full min-h-[60vh] flex-none overflow-hidden"
+            className="relative w-full h-[calc(95vh-54px)] flex-none overflow-hidden"
         >
             <Image
                 src={cover}
@@ -25,12 +25,12 @@ export default function Banner() {
             <div className="absolute inset-0 z-20 flex flex-col items-center justify-center text-center px-6">
                 {/* Headline */}
                 <h1 className="text-4xl md:text-6xl font-bold text-white drop-shadow-md">
-                    Inventory & Transaction Management, simplified
+                    Inventory Management
                 </h1>
 
                 {/* Subheadline */}
                 <h3 className="mt-4 text-lg md:text-2xl font-serif text-white drop-shadow-sm max-w-4xl">
-                    Track stock, record transactions, and generate reports — all in one place.
+                    View Products & Make Transaction Request 
                 </h3>
             </div>
 
@@ -43,9 +43,9 @@ export default function Banner() {
             <button
                 className="absolute bottom-4 right-4 z-30 bg-white text-cyan-600 border border-cyan-600 font-semibold py-3 px-5 rounded hover:bg-cyan-600 hover:text-white"
                 onClick={(e) => { e.stopPropagation(); router.push('/product') }}
-                aria-label="View Inventory"
+                aria-label="View Product"
             >
-                View Inventory
+                View Product
             </button>
         </div>
     )

@@ -17,6 +17,7 @@ export default function EditRequestModalInner({ requestId, modalRoot, onClose }:
         transactionType,
         productId,
         itemAmount,
+        transactionDate,
         products,
         selectedProduct,
         loading,
@@ -27,6 +28,7 @@ export default function EditRequestModalInner({ requestId, modalRoot, onClose }:
         handleTransactionTypeChange,
         handleProductChange,
         handleItemAmountChange,
+        handleTransactionDateChange,
         handleSubmit,
     } = useEditRequestForm(requestId);
 
@@ -71,6 +73,7 @@ export default function EditRequestModalInner({ requestId, modalRoot, onClose }:
                         transactionType={transactionType}
                         productId={productId}
                         itemAmount={itemAmount}
+                        transactionDate={transactionDate}
                         products={products}
                         selectedProduct={selectedProduct}
                         loading={loading}
@@ -79,8 +82,9 @@ export default function EditRequestModalInner({ requestId, modalRoot, onClose }:
                         onTransactionTypeChange={handleTransactionTypeChange}
                         onProductChange={handleProductChange}
                         onItemAmountChange={handleItemAmountChange}
+                        onTransactionDateChange={handleTransactionDateChange}
                         onSubmit={handleSubmit}
-                        buttonText="Update Request"
+                        buttonText="Update"
                         loadingText="Updating..."
                     />
                 )}
