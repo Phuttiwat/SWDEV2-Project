@@ -7,6 +7,8 @@ import { getRequests, deleteRequest } from "@/libs/Request";
 import { getProductById, updateStock } from "@/libs/Product";
 import getUserRole from "@/libs/getUserRole";
 import { Request } from "../../../interface";
+import RequestCard from "./RequestCard";
+import ConfirmModal from "./ConfirmModal";
 
 type Props = {
     onEditClick?: (id: string) => void;
@@ -21,6 +23,21 @@ export default function RequestList({ onEditClick, sortOrder = 'newest' }: Props
     const [error, setError] = useState("");
     const [userRole, setUserRole] = useState<string | null>(null);
     const isAdmin = userRole === 'admin';
+    
+    // Modal states
+    const [confirmModal, setConfirmModal] = useState<{
+        isOpen: boolean;
+        type: 'approve' | 'delete' | null;
+        requestId: string | null;
+        message: string;
+        currentStock?: number;
+        newStock?: number;
+    }>({
+        isOpen: false,
+        type: null,
+        requestId: null,
+        message: '',
+    });
 
     // Fetch user role
     useEffect(() => {
@@ -52,6 +69,18 @@ export default function RequestList({ onEditClick, sortOrder = 'newest' }: Props
                 const requestsData = Array.isArray(response)
                     ? response
                     : (response as any)?.data || [];
+                
+                // Debug: Check if product_id is populated
+                if (requestsData.length > 0) {
+                    const firstRequest = requestsData[0];
+                    console.log("Sample request from API:", {
+                        hasProductId: !!firstRequest.product_id,
+                        productIdType: typeof firstRequest.product_id,
+                        productIdValue: firstRequest.product_id,
+                        isPopulated: typeof firstRequest.product_id === 'object' && firstRequest.product_id !== null
+                    });
+                }
+                
                 setRequests(requestsData);
             } catch (err: any) {
                 console.error("Failed to fetch requests:", err);
@@ -155,23 +184,57 @@ export default function RequestList({ onEditClick, sortOrder = 'newest' }: Props
                 return;
             }
 
-            // 4. แสดง confirm dialog พร้อมข้อมูล stock
-            if (!confirm(`Are you sure you want to approve this request? This will update the product stock from ${currentStock} to ${newStockQuantity}.`)) {
+            // 4. แสดง confirm modal พร้อมข้อมูล stock
+            setConfirmModal({
+                isOpen: true,
+                type: 'approve',
+                requestId: requestId,
+                message: `Are you sure you want to approve this request?\n\nThis will update the product stock from ${currentStock} to ${newStockQuantity}.`,
+                currentStock,
+                newStock: newStockQuantity,
+            });
+        } catch (err: any) {
+            console.error("Failed to prepare approve request:", err);
+            setError(err.message || "Failed to prepare approve request");
+        }
+    };
+
+    const executeApprove = async () => {
+        if (!session?.user?.token || !confirmModal.requestId) {
+            return;
+        }
+
+        const requestId = confirmModal.requestId;
+        setConfirmModal({ isOpen: false, type: null, requestId: null, message: '' });
+
+        try {
+            const request = requests.find(req => req._id === requestId);
+            if (!request) {
+                setError("Request not found");
                 return;
             }
 
-            // 5. อัพเดต stockQuantity ใน product
-            console.log("Updating stock - ProductId:", productId, "New Stock:", newStockQuantity);
+            let productId: string | undefined;
+            if (request.product_id) {
+                if (typeof request.product_id === 'object' && (request.product_id as any)._id) {
+                    productId = (request.product_id as any)._id;
+                } else if (typeof request.product_id === 'string') {
+                    productId = request.product_id;
+                }
+            }
+
             if (!productId || productId === 'undefined' || productId === 'null') {
                 setError("Invalid product ID for stock update");
                 return;
             }
-            await updateStock(productId, newStockQuantity, session.user.token);
 
-            // 6. ลบ request transaction
+            // อัพเดต stockQuantity ใน product
+            await updateStock(productId, confirmModal.newStock!, session.user.token);
+
+            // ลบ request transaction
             await deleteRequest(requestId, session.user.token);
 
-            // 7. อัพเดต local state (ลบ request ออกจาก list)
+            // อัพเดต local state (ลบ request ออกจาก list)
             setRequests(prev => prev.filter(req => req._id !== requestId));
         } catch (err: any) {
             console.error("Failed to approve request:", err);
@@ -179,15 +242,22 @@ export default function RequestList({ onEditClick, sortOrder = 'newest' }: Props
         }
     };
 
-    const handleDelete = async (requestId: string) => {
-        if (!session?.user?.token) {
-            setError("No session token available");
+    const handleDelete = (requestId: string) => {
+        setConfirmModal({
+            isOpen: true,
+            type: 'delete',
+            requestId: requestId,
+            message: "Are you sure you want to delete this request?\n\nThis action cannot be undone.",
+        });
+    };
+
+    const executeDelete = async () => {
+        if (!session?.user?.token || !confirmModal.requestId) {
             return;
         }
 
-        if (!confirm("Are you sure you want to delete this request?")) {
-            return;
-        }
+        const requestId = confirmModal.requestId;
+        setConfirmModal({ isOpen: false, type: null, requestId: null, message: '' });
 
         try {
             await deleteRequest(requestId, session.user.token);
@@ -224,67 +294,36 @@ export default function RequestList({ onEditClick, sortOrder = 'newest' }: Props
     }
 
     return (
-        <div>
-            {sortedRequests.map((request) => {
-                const product = typeof request.product_id === 'object'
-                    ? request.product_id
-                    : null;
-                const user = typeof request.user === 'object'
-                    ? request.user
-                    : null;
-                const transactionDate = new Date(request.transactionDate).toLocaleDateString();
-                const isStockOut = request.transactionType === 'stockOut';
-                const cardBgColor = isStockOut ? 'bg-red-50' : 'bg-slate-200';
-
-                return (
-                    <div
-                        className={`${cardBgColor} rounded px-5 mx-5 py-2 my-2`}
+        <>
+            <ConfirmModal
+                isOpen={confirmModal.isOpen}
+                title={confirmModal.type === 'approve' ? 'Approve Request' : 'Delete Request'}
+                message={confirmModal.message}
+                confirmText={confirmModal.type === 'approve' ? 'Approve' : 'Delete'}
+                cancelText="Cancel"
+                type={confirmModal.type === 'delete' ? 'danger' : 'info'}
+                onConfirm={() => {
+                    if (confirmModal.type === 'approve') {
+                        executeApprove();
+                    } else if (confirmModal.type === 'delete') {
+                        executeDelete();
+                    }
+                }}
+                onCancel={() => setConfirmModal({ isOpen: false, type: null, requestId: null, message: '' })}
+            />
+            
+            <div>
+                {sortedRequests.map((request) => (
+                    <RequestCard
                         key={request._id}
-                    >
-                        {isAdmin && (
-                            <div className="text-xl">Request ID: {request._id}</div>
-                        )}
-                        {product && (
-                            <>
-                                <div className="text-xl">Product: {product.name}</div>
-                                <div className="text-xl">SKU: {product.sku}</div>
-                                <div className="text-xl">Category: {product.category}</div>
-                            </>
-                        )}
-                        {user && isAdmin && (
-                            <div className="text-xl">User: {user.name} ({user.email})</div>
-                        )}
-                        <div className="text-xl">Transaction Type: {request.transactionType}</div>
-                        <div className="text-xl">Item Amount: {request.itemAmount}</div>
-                        <div className="text-xl">Transaction Date: {transactionDate}</div>
-                        <div className="mt-2 flex gap-2">
-                            {isAdmin && (
-                                <button
-                                    name="Approve"
-                                    className="block rounded-md bg-green-500 hover:bg-green-600 px-3 py-2 text-white shadow-md font-semibold !border-none relative z-10"
-                                    onClick={() => handleApprove(request._id)}
-                                >
-                                    Approve
-                                </button>
-                            )}
-                            <button
-                                name="Edit"
-                                className="block rounded-md bg-blue-500 hover:bg-blue-600 px-3 py-2 text-white shadow-md font-semibold !border-none relative z-10"
-                                onClick={() => handleEdit(request._id)}
-                            >
-                                Edit
-                            </button>
-                            <button
-                                name="Delete"
-                                className="block rounded-md bg-red-500 hover:bg-red-600 px-3 py-2 text-white shadow-md font-semibold !border-none relative z-10"
-                                onClick={() => handleDelete(request._id)}
-                            >
-                                Delete
-                            </button>
-                        </div>
-                    </div>
-                );
-            })}
-        </div>
+                        request={request}
+                        isAdmin={isAdmin}
+                        onEdit={handleEdit}
+                        onApprove={handleApprove}
+                        onDelete={handleDelete}
+                    />
+                ))}
+            </div>
+        </>
     );
 }

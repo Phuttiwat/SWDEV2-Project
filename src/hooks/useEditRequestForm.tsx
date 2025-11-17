@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { getRequest, updateRequest } from "@/libs/Request";
 import { getProducts } from "@/libs/Product";
 import { Product, UpdateRequestPayload, TransactionType, Request } from "../../interface";
+import dayjs from "dayjs";
 
 export function useEditRequestForm(requestId: string) {
     const { data: session } = useSession();
@@ -11,6 +12,7 @@ export function useEditRequestForm(requestId: string) {
     const [transactionType, setTransactionType] = useState<TransactionType>("stockIn");
     const [productId, setProductId] = useState("");
     const [itemAmount, setItemAmount] = useState<number>(0);
+    const [transactionDate, setTransactionDate] = useState<string | Date | null>(null);
     const [products, setProducts] = useState<Product[]>([]);
     const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
     const [loading, setLoading] = useState(false);
@@ -79,6 +81,7 @@ export function useEditRequestForm(requestId: string) {
                 setTransactionType(requestData.transactionType);
                 setProductId(productIdValue);
                 setItemAmount(requestData.itemAmount);
+                setTransactionDate(requestData.transactionDate || null);
             } catch (err: any) {
                 console.error("Failed to fetch request:", err);
                 setError(err.message || "Failed to load request");
@@ -117,6 +120,11 @@ export function useEditRequestForm(requestId: string) {
         setError("");
     };
 
+    const handleTransactionDateChange = (value: string | Date | null) => {
+        setTransactionDate(value);
+        setError("");
+    };
+
     const handleSubmit = async () => {
         setError("");
         
@@ -151,9 +159,17 @@ export function useEditRequestForm(requestId: string) {
             return;
         }
 
+        if (!transactionDate) {
+            setError("Please select a transaction date and time");
+            return;
+        }
+
         setLoading(true);
         try {
             const requestData: UpdateRequestPayload = {
+                transactionDate: transactionDate instanceof Date 
+                    ? transactionDate.toISOString() 
+                    : transactionDate,
                 transactionType: transactionType,
                 itemAmount: itemAmount,
                 product_id: productId,
@@ -175,6 +191,7 @@ export function useEditRequestForm(requestId: string) {
         transactionType,
         productId,
         itemAmount,
+        transactionDate,
         products,
         selectedProduct,
         loading,
@@ -185,6 +202,7 @@ export function useEditRequestForm(requestId: string) {
         handleTransactionTypeChange,
         handleProductChange,
         handleItemAmountChange,
+        handleTransactionDateChange,
         handleSubmit,
     };
 }

@@ -113,7 +113,7 @@ export default function RequestPage() {
                             onClick={() => setIsCreateOpen(true)}
                             className="inline-flex items-center justify-center rounded-md bg-blue-500 hover:bg-blue-600 px-3 py-1 text-white shadow-md font-semibold text-sm h-8"
                         >
-                            Create Request
+                            New Request
                         </button>
                     )}
                 </div>

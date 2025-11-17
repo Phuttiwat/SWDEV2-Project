@@ -3,6 +3,7 @@ import { useSession } from "next-auth/react";
 import { addRequest } from "@/libs/Request";
 import { getProducts } from "@/libs/Product";
 import { Product, CreateRequestPayload, TransactionType } from "../../interface";
+import dayjs from "dayjs";
 
 const STORAGE_KEY = "requestFormState";
 
@@ -29,6 +30,9 @@ export function useRequestForm(onSuccess?: () => void) {
     );
     const [productId, setProductId] = useState(savedState?.productId || "");
     const [itemAmount, setItemAmount] = useState<number>(savedState?.itemAmount || 0);
+    const [transactionDate, setTransactionDate] = useState<string | Date | null>(
+        savedState?.transactionDate || null
+    );
     const [products, setProducts] = useState<Product[]>([]);
     const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
     const [loading, setLoading] = useState(false);
@@ -74,12 +78,13 @@ export function useRequestForm(onSuccess?: () => void) {
                     transactionType,
                     productId,
                     itemAmount,
+                    transactionDate,
                 }));
             } catch (error) {
                 console.error("Failed to save state:", error);
             }
         }
-    }, [transactionType, productId, itemAmount]);
+    }, [transactionType, productId, itemAmount, transactionDate]);
 
     // Update selected product when productId changes
     useEffect(() => {
@@ -106,6 +111,11 @@ export function useRequestForm(onSuccess?: () => void) {
 
     const handleItemAmountChange = (value: number) => {
         setItemAmount(value);
+        setError("");
+    };
+
+    const handleTransactionDateChange = (value: string | Date | null) => {
+        setTransactionDate(value);
         setError("");
     };
 
@@ -143,10 +153,18 @@ export function useRequestForm(onSuccess?: () => void) {
             return;
         }
 
+        if (!transactionDate) {
+            setError("Please select a transaction date and time");
+            return;
+        }
+
         setLoading(true);
         setError(""); // Clear any previous errors
         try {
             const requestData: CreateRequestPayload = {
+                transactionDate: transactionDate instanceof Date 
+                    ? transactionDate.toISOString() 
+                    : transactionDate,
                 transactionType: transactionType,
                 itemAmount: itemAmount,
                 user: session.user._id,
@@ -170,6 +188,7 @@ export function useRequestForm(onSuccess?: () => void) {
             // Reset form
             setProductId("");
             setItemAmount(0);
+            setTransactionDate(null);
             setSelectedProduct(null);
             
             // Call success callback if provided
@@ -189,6 +208,7 @@ export function useRequestForm(onSuccess?: () => void) {
         transactionType,
         productId,
         itemAmount,
+        transactionDate,
         products,
         selectedProduct,
         loading,
@@ -197,6 +217,7 @@ export function useRequestForm(onSuccess?: () => void) {
         handleTransactionTypeChange,
         handleProductChange,
         handleItemAmountChange,
+        handleTransactionDateChange,
         handleSubmit,
     };
 }

@@ -48,7 +48,7 @@ export default function RegisterForm() {
             const result = await userRegister(name, email, tel, role, password);
             // Registration successful
             alert("Registration successful! Please log in.");
-            router.push("/api/auth/signin");
+            router.push("/login");
         } catch (err) {
             const errorMessage = err instanceof Error ? err.message : "Registration failed. Please try again.";
             setError(errorMessage);
@@ -151,7 +151,7 @@ export default function RegisterForm() {
             <div className="text-center text-sm text-gray-600 mt-4">
                 Already have an account?{" "}
                 <a 
-                    href="/api/auth/signin" 
+                    href="/login" 
                     className="text-sky-600 hover:text-indigo-600 underline"
                 >
                     Sign In

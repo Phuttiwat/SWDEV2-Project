@@ -90,6 +90,7 @@ export interface RequestFormProps {
   transactionType: TransactionType;
   productId: string;
   itemAmount: number;
+  transactionDate: string | Date | null;
   products: Product[];
   selectedProduct: Product | null;
   loading: boolean;
@@ -98,6 +99,7 @@ export interface RequestFormProps {
   onTransactionTypeChange: (value: TransactionType) => void;
   onProductChange: (value: string) => void;
   onItemAmountChange: (value: number) => void;
+  onTransactionDateChange: (value: string | Date | null) => void;
   onSubmit: () => void;
   buttonText?: string;
   loadingText?: string;
