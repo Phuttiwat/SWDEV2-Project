@@ -86,13 +86,20 @@ export default async function ProductCatalog(props: {
         key={product._id ?? product.sku}
         className="w-1/3 flex flex-col items-stretch p-2"
       >
-        <Link href={`/product/${product._id}`} className="block">
-          <Card
-            venueName={product.name}
-            imgSrc={product.picture}
-            actionButtons={adminActions}
-          />
-        </Link>
+        <div className="flex flex-col">
+          <Link href={`/product/${product._id}`} className="block">
+            <Card
+              venueName={product.name}
+              imgSrc={product.picture}
+              actionButtons={null}
+            />
+          </Link>
+          {adminActions && (
+            <div className="mt-2 flex justify-end">
+              {adminActions}
+            </div>
+          )}
+        </div>
       </div>
     );
   })}
