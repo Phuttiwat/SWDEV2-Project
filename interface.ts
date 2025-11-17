@@ -80,7 +80,8 @@ export interface Request {
     sku: string;
     category: string;
     stockQuantity: number;
-  } | string;
+    isActive?: boolean;
+  } | string | null;
   createdAt?: string | Date;
   updatedAt?: string | Date;
 }
@@ -103,6 +104,7 @@ export interface RequestFormProps {
   onSubmit: () => void;
   buttonText?: string;
   loadingText?: string;
+  disableProductSelect?: boolean;
 }
 
 export interface SubmitButtonProps {
@@ -130,6 +132,7 @@ export interface ProductSelectProps {
   products: Product[];
   value: string;
   onChange: (value: string) => void;
+  disabled?: boolean;
 }
 
 export interface TransactionTypeSelectProps {

@@ -7,12 +7,12 @@ import dayjs from "dayjs";
 
 const STORAGE_KEY = "requestFormState";
 
-export function useRequestForm(onSuccess?: () => void) {
+export function useRequestForm(onSuccess?: () => void, initialProductId?: string) {
     const { data: session } = useSession();
     
-    // Load initial state from localStorage
+    // Load initial state from localStorage (only if no fixed product)
     const loadSavedState = () => {
-        if (typeof window === "undefined") return null;
+        if (initialProductId || typeof window === "undefined") return null;
         try {
             const saved = localStorage.getItem(STORAGE_KEY);
             if (saved) {
@@ -28,7 +28,7 @@ export function useRequestForm(onSuccess?: () => void) {
     const [transactionType, setTransactionType] = useState<TransactionType>(
         savedState?.transactionType || "stockIn"
     );
-    const [productId, setProductId] = useState(savedState?.productId || "");
+    const [productId, setProductId] = useState(initialProductId || savedState?.productId || "");
     const [itemAmount, setItemAmount] = useState<number>(savedState?.itemAmount || 0);
     const [transactionDate, setTransactionDate] = useState<string | Date | null>(
         savedState?.transactionDate || null
@@ -70,21 +70,27 @@ export function useRequestForm(onSuccess?: () => void) {
         }
     }, [session]);
 
-    // Save state to localStorage whenever it changes
+    // Save state to localStorage whenever it changes (only if no fixed product)
     useEffect(() => {
-        if (typeof window !== "undefined") {
-            try {
-                localStorage.setItem(STORAGE_KEY, JSON.stringify({
-                    transactionType,
-                    productId,
-                    itemAmount,
-                    transactionDate,
-                }));
-            } catch (error) {
-                console.error("Failed to save state:", error);
-            }
+        if (initialProductId || typeof window === "undefined") return;
+        try {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify({
+                transactionType,
+                productId,
+                itemAmount,
+                transactionDate,
+            }));
+        } catch (error) {
+            console.error("Failed to save state:", error);
         }
-    }, [transactionType, productId, itemAmount, transactionDate]);
+    }, [transactionType, productId, itemAmount, transactionDate, initialProductId]);
+
+    // Set initial productId if provided (only once)
+    useEffect(() => {
+        if (initialProductId && productId !== initialProductId) {
+            setProductId(initialProductId);
+        }
+    }, [initialProductId]); // Only depend on initialProductId
 
     // Update selected product when productId changes
     useEffect(() => {
@@ -105,6 +111,10 @@ export function useRequestForm(onSuccess?: () => void) {
     };
 
     const handleProductChange = (value: string) => {
+        // Don't allow changing product if fixed product is set
+        if (initialProductId) {
+            return;
+        }
         setProductId(value);
         setError("");
     };
@@ -185,11 +195,15 @@ export function useRequestForm(onSuccess?: () => void) {
                 }
             }
             
-            // Reset form
-            setProductId("");
+            // Reset form (but keep productId if fixed)
+            if (!initialProductId) {
+                setProductId("");
+            }
             setItemAmount(0);
             setTransactionDate(null);
-            setSelectedProduct(null);
+            if (!initialProductId) {
+                setSelectedProduct(null);
+            }
             
             // Call success callback if provided
             if (onSuccess) {

@@ -2,6 +2,7 @@
 import { TextField, Alert } from "@mui/material";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { signIn } from "next-auth/react";
 
 export default function LoginForm() {
@@ -97,12 +98,12 @@ export default function LoginForm() {
 
             <div className="text-center text-sm text-gray-600 mt-4">
                 Don't have an account?{" "}
-                <a 
+                <Link 
                     href="/register" 
                     className="text-sky-600 hover:text-indigo-600 underline"
                 >
                     Register
-                </a>
+                </Link>
             </div>
         </div>
     );

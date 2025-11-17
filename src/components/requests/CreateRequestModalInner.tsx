@@ -8,9 +8,10 @@ type Props = {
     modalRoot: HTMLElement;
     onClose: () => void;
     onSuccess?: () => void;
+    fixedProductId?: string;
 };
 
-export default function CreateRequestModalInner({ modalRoot, onClose, onSuccess }: Props) {
+export default function CreateRequestModalInner({ modalRoot, onClose, onSuccess, fixedProductId }: Props) {
     const handleCreateSuccess = () => {
         if (onSuccess) {
             onSuccess();
@@ -33,7 +34,7 @@ export default function CreateRequestModalInner({ modalRoot, onClose, onSuccess 
         handleItemAmountChange,
         handleTransactionDateChange,
         handleSubmit,
-    } = useRequestForm(handleCreateSuccess);
+    } = useRequestForm(handleCreateSuccess, fixedProductId);
 
     // Note: modal overlay + dialog markup -- displayed inside createPortal by parent
     return (
@@ -76,6 +77,7 @@ export default function CreateRequestModalInner({ modalRoot, onClose, onSuccess 
                     onSubmit={handleSubmit}
                     buttonText="Create"
                     loadingText="Creating..."
+                    disableProductSelect={!!fixedProductId}
                 />
             </div>
         </div>

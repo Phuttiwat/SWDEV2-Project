@@ -132,6 +132,10 @@ export async function updateStock(
     headers,
     body: JSON.stringify({ stockQuantity }),
   });
-  if (!res.ok) throw new Error("Failed to update stock");
+  if (!res.ok) {
+    const errorData = await res.json().catch(() => ({}));
+    const errorMessage = errorData.error || "Failed to update stock. Stock quantity cannot be negative.";
+    throw new Error(errorMessage);
+  }
   return res.json();
 }

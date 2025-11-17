@@ -6,7 +6,7 @@ import { getProducts } from "@/libs/Product";
 import { Product, UpdateRequestPayload, TransactionType, Request } from "../../interface";
 import dayjs from "dayjs";
 
-export function useEditRequestForm(requestId: string) {
+export function useEditRequestForm(requestId: string, onSuccess?: () => void) {
     const { data: session } = useSession();
     const router = useRouter();
     const [transactionType, setTransactionType] = useState<TransactionType>("stockIn");
@@ -178,8 +178,12 @@ export function useEditRequestForm(requestId: string) {
             const token = session.user.token;
             await updateRequest(requestId, requestData, token);
             
-            // Success - redirect to request list
-            router.push("/request");
+            // Success - call callback if provided, otherwise redirect
+            if (onSuccess) {
+                onSuccess();
+            } else {
+                router.push("/request");
+            }
         } catch (err: any) {
             setError(err.message || "Failed to update request");
         } finally {

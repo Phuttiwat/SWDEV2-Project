@@ -2,6 +2,7 @@
 import { Select, MenuItem, TextField, Alert } from "@mui/material";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import userRegister from "@/libs/userRegister";
 
 export default function RegisterForm() {
@@ -150,12 +151,12 @@ export default function RegisterForm() {
 
             <div className="text-center text-sm text-gray-600 mt-4">
                 Already have an account?{" "}
-                <a 
+                <Link 
                     href="/login" 
                     className="text-sky-600 hover:text-indigo-600 underline"
                 >
                     Sign In
-                </a>
+                </Link>
             </div>
         </div>
     );

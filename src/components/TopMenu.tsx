@@ -49,16 +49,6 @@ export default async function TopMenu() {
                 {/* Right side - Actions */}
                 <div className="flex items-center gap-4">
                     {
-                        isAdmin && (
-                            <Link 
-                                href="/product/manage" 
-                                className="text-[#232f3e] text-sm font-normal hover:text-[#ff9900] transition-colors"
-                            >
-                                Add Product
-                            </Link>
-                        )
-                    }
-                    {
                         session ? (
                             <SignOutButton userName={session.user?.name || 'User'} />
                         ) : (

@@ -1,6 +1,6 @@
 // components/requests/RequestList.tsx
 "use client";
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useCallback } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { getRequests, deleteRequest, getRequest } from "@/libs/Request";
@@ -55,43 +55,43 @@ export default function RequestList({ onEditClick, sortOrder = 'newest' }: Props
         fetchUserRole();
     }, [session]);
 
-    useEffect(() => {
-        const fetchRequests = async () => {
-            if (!session?.user?.token) {
-                setLoading(false);
-                return;
-            }
+    const fetchRequests = useCallback(async () => {
+        if (!session?.user?.token) {
+            setLoading(false);
+            return;
+        }
 
-            setLoading(true);
-            try {
-                const response = await getRequests(session.user.token);
-                // Backend returns { success: true, data: requests } or just requests array
-                const requestsData = Array.isArray(response)
-                    ? response
-                    : (response as any)?.data || [];
-                
-                // Debug: Check if product_id is populated
-                if (requestsData.length > 0) {
-                    const firstRequest = requestsData[0];
-                    console.log("Sample request from API:", {
-                        hasProductId: !!firstRequest.product_id,
-                        productIdType: typeof firstRequest.product_id,
-                        productIdValue: firstRequest.product_id,
-                        isPopulated: typeof firstRequest.product_id === 'object' && firstRequest.product_id !== null
-                    });
-                }
-                
-                setRequests(requestsData);
-            } catch (err: any) {
-                console.error("Failed to fetch requests:", err);
-                setError(err.message || "Failed to load requests");
-            } finally {
-                setLoading(false);
+        setLoading(true);
+        try {
+            const response = await getRequests(session.user.token);
+            // Backend returns { success: true, data: requests } or just requests array
+            const requestsData = Array.isArray(response)
+                ? response
+                : (response as any)?.data || [];
+            
+            // Debug: Check if product_id is populated
+            if (requestsData.length > 0) {
+                const firstRequest = requestsData[0];
+                console.log("Sample request from API:", {
+                    hasProductId: !!firstRequest.product_id,
+                    productIdType: typeof firstRequest.product_id,
+                    productIdValue: firstRequest.product_id,
+                    isPopulated: typeof firstRequest.product_id === 'object' && firstRequest.product_id !== null
+                });
             }
-        };
-
-        fetchRequests();
+            
+            setRequests(requestsData);
+        } catch (err: any) {
+            console.error("Failed to fetch requests:", err);
+            setError(err.message || "Failed to load requests");
+        } finally {
+            setLoading(false);
+        }
     }, [session]);
+
+    useEffect(() => {
+        fetchRequests();
+    }, [fetchRequests]);
 
     // Sort requests based on sortOrder (memoized for performance)
     const sortedRequests = useMemo(() => {
@@ -234,11 +234,12 @@ export default function RequestList({ onEditClick, sortOrder = 'newest' }: Props
             // ลบ request transaction
             await deleteRequest(requestId, session.user.token);
 
-            // อัพเดต local state (ลบ request ออกจาก list)
-            setRequests(prev => prev.filter(req => req._id !== requestId));
+            // Refetch requests to update all cards
+            await fetchRequests();
         } catch (err: any) {
             console.error("Failed to approve request:", err);
-            setError(err.message || "Failed to approve request");
+            // Refetch requests even on error to update other cards
+            await fetchRequests();
         }
     };
 

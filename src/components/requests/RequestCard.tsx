@@ -21,17 +21,37 @@ export default function RequestCard({ request, isAdmin, onEdit, onApprove, onDel
     const cardContentRef = useRef<HTMLDivElement>(null);
     const router = useRouter();
 
-    const product = typeof request.product_id === 'object'
+    const product = typeof request.product_id === 'object' && request.product_id !== null
         ? request.product_id
         : null;
     const user = typeof request.user === 'object'
         ? request.user
         : null;
     const isStockOut = request.transactionType === 'stockOut';
-    const cardBgColor = isStockOut ? 'bg-red-50' : 'bg-slate-200';
+    
+    // Check if product is deleted (product_id is null/undefined when product is deleted, or isActive is false)
+    const isProductDeleted = !product || product === null || (product as any)?.isActive === false;
+    
+    // Check if stockOut request exceeds current stock
+    const currentStock = product && typeof product === 'object' && product !== null
+        ? (product as any).stockQuantity 
+        : null;
+    const exceedsStock = isStockOut && currentStock !== null && currentStock !== undefined && request.itemAmount > currentStock;
+    
+    // Determine if approve should be disabled
+    const canApprove = !isProductDeleted && !exceedsStock;
+    
+    // Card background color - disabled style if product deleted
+    let cardBgColor = isStockOut ? 'bg-red-50' : 'bg-green-50';
+    if (isProductDeleted) {
+        cardBgColor = 'bg-gray-300 opacity-60';
+    }
     
     // Extract product ID from populated or string product_id (no fetch needed - data already populated from backend)
     const extractProductId = () => {
+        if (request.product_id === null || request.product_id === undefined) {
+            return null;
+        }
         if (typeof request.product_id === 'object' && request.product_id._id) {
             return request.product_id._id;
         } else if (typeof request.product_id === 'string') {
@@ -165,15 +185,43 @@ export default function RequestCard({ request, isAdmin, onEdit, onApprove, onDel
                     </span>
                 </div>
                 <div className="text-sm text-gray-600 mt-1">{transactionDate}</div>
+                
+                {/* Status warnings - visible to all users */}
+                {!canApprove && (
+                    <div className="mt-2 p-2 bg-yellow-50 border border-yellow-200 rounded-md">
+                        <div className="text-xs text-yellow-800 font-semibold">
+                            {isProductDeleted 
+                                ? '⚠️ Product has been deleted' 
+                                : exceedsStock 
+                                ? `⚠️ Request amount (${request.itemAmount}) exceeds current stock (${currentStock} available)`
+                                : ''}
+                        </div>
+                    </div>
+                )}
+                
                 {isAdmin && (
                     <div className="mt-2">
                         <button
                             name="Approve"
-                            className="block rounded-md bg-green-500 hover:bg-green-600 px-3 py-2 text-white shadow-md font-semibold !border-none relative z-10"
+                            disabled={!canApprove}
+                            className={`block rounded-md px-3 py-2 text-white shadow-md font-semibold !border-none relative z-10 transition-colors ${
+                                canApprove
+                                    ? 'bg-green-500 hover:bg-green-600 cursor-pointer'
+                                    : 'bg-gray-400 cursor-not-allowed opacity-60'
+                            }`}
                             onClick={(e) => {
                                 e.stopPropagation();
-                                onApprove(request._id);
+                                if (canApprove) {
+                                    onApprove(request._id);
+                                }
                             }}
+                            title={
+                                isProductDeleted
+                                    ? 'Cannot approve: Product has been deleted'
+                                    : exceedsStock
+                                    ? `Cannot approve: Request amount (${request.itemAmount}) exceeds current stock (${currentStock})`
+                                    : 'Approve request'
+                            }
                         >
                             Approve
                         </button>

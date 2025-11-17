@@ -7,6 +7,7 @@ import RequestList from "@/components/requests/RequestList";
 import EditRequestModalInner from "@/components/requests/EditRequestModalInner";
 import CreateRequestModalInner from "@/components/requests/CreateRequestModalInner";
 import getUserRole from "@/libs/getUserRole";
+import Footer from "@/components/Footer";
 
 export default function RequestPage() {
     const { data: session } = useSession();
@@ -82,7 +83,13 @@ export default function RequestPage() {
     const handleCloseEdit = () => {
         setIsEditOpen(false);
         setSelectedEditId(null);
-        setRefreshKey(k => k + 1); // refresh list after edit (optional)
+        // Don't refresh when just closing - only refresh on successful update
+    };
+
+    const handleEditSuccess = () => {
+        setIsEditOpen(false);
+        setSelectedEditId(null);
+        setRefreshKey(k => k + 1); // refresh list after successful edit
     };
 
     // helper: only show create button to staff
@@ -93,54 +100,58 @@ export default function RequestPage() {
     };
 
     return (
-        <main className="w-full flex flex-col space-y-6 p-8">
-            <div className="flex items-center justify-between gap-4">
-                <div className="text-2xl font-semibold text-gray-800">Requests</div>
+        <div className="flex flex-col min-h-screen">
+            <main className="w-full flex flex-col space-y-6 p-8 flex-1">
+                <div className="flex items-center justify-between gap-4">
+                    <div className="text-2xl font-semibold text-gray-800">Requests</div>
 
-                <div className="flex items-center gap-3">
-                    {/* Sort toggle button */}
-                    <button
-                        onClick={handleSortToggle}
-                        className="inline-flex items-center justify-center rounded-md bg-gray-200 hover:bg-gray-600 px-3 py-1 text-black hover:text-white shadow-md font-semibold text-sm h-8"
-                        title={sortOrder === 'newest' ? 'Sort: Newest First' : 'Sort: Oldest First'}
-                    >
-                        {sortOrder === 'newest' ? '↓ Newest' : '↑ Oldest'}
-                    </button>
-
-                    {/* Create button: compact size, only visible to staff */}
-                    {canCreate && (
+                    <div className="flex items-center gap-3">
+                        {/* Sort toggle button */}
                         <button
-                            onClick={() => setIsCreateOpen(true)}
-                            className="inline-flex items-center justify-center rounded-md bg-blue-500 hover:bg-blue-600 px-3 py-1 text-white shadow-md font-semibold text-sm h-8"
+                            onClick={handleSortToggle}
+                            className="inline-flex items-center justify-center rounded-md bg-gray-200 hover:bg-gray-600 px-3 py-1 text-black hover:text-white shadow-md font-semibold text-sm h-8"
+                            title={sortOrder === 'newest' ? 'Sort: Newest First' : 'Sort: Oldest First'}
                         >
-                            New Request
+                            {sortOrder === 'newest' ? '↓ Newest' : '↑ Oldest'}
                         </button>
-                    )}
+
+                        {/* Create button: compact size, only visible to staff */}
+                        {canCreate && (
+                            <button
+                                onClick={() => setIsCreateOpen(true)}
+                                className="inline-flex items-center justify-center rounded-md bg-blue-500 hover:bg-blue-600 px-3 py-1 text-white shadow-md font-semibold text-sm h-8"
+                            >
+                                New Request
+                            </button>
+                        )}
+                    </div>
                 </div>
-            </div>
 
-            {/* Pass onEditClick and sortOrder to RequestList */}
-            <RequestList key={refreshKey} onEditClick={handleOpenEdit} sortOrder={sortOrder} />
+                {/* Pass onEditClick and sortOrder to RequestList */}
+                <RequestList key={refreshKey} onEditClick={handleOpenEdit} sortOrder={sortOrder} />
 
-            {/* Create Modal */}
-            {mounted && isCreateOpen && modalRoot && createPortal(
-                <CreateRequestModalInner
-                    modalRoot={modalRoot}
-                    onClose={() => setIsCreateOpen(false)}
-                    onSuccess={handleCreateSuccess}
-                />,
-                modalRoot
-            )}
+                {/* Create Modal */}
+                {mounted && isCreateOpen && modalRoot && createPortal(
+                    <CreateRequestModalInner
+                        modalRoot={modalRoot}
+                        onClose={() => setIsCreateOpen(false)}
+                        onSuccess={handleCreateSuccess}
+                    />,
+                    modalRoot
+                )}
 
-            {/* Edit Modal - mount EditRequestModalInner only when needed */}
-            {mounted && isEditOpen && selectedEditId && modalRoot && createPortal(
-                <EditRequestModalInner
-                    requestId={selectedEditId}
-                    modalRoot={modalRoot}
-                    onClose={handleCloseEdit}
-                />,
-                modalRoot
-            )}
-        </main>
+                {/* Edit Modal - mount EditRequestModalInner only when needed */}
+                {mounted && isEditOpen && selectedEditId && modalRoot && createPortal(
+                    <EditRequestModalInner
+                        requestId={selectedEditId}
+                        modalRoot={modalRoot}
+                        onClose={handleCloseEdit}
+                        onSuccess={handleEditSuccess}
+                    />,
+                    modalRoot
+                )}
+            </main>
+            <Footer />
+        </div>
     );
 }

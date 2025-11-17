@@ -25,6 +25,7 @@ export default function RequestForm({
     onSubmit,
     buttonText,
     loadingText,
+    disableProductSelect = false,
 }: RequestFormProps) {
     // Convert transactionDate to Dayjs for the picker
     const dateValue = transactionDate 
@@ -48,13 +49,7 @@ export default function RequestForm({
                     products={products}
                     value={productId}
                     onChange={onProductChange}
-                />
-            )}
-
-            {selectedProduct && (
-                <StockInfo
-                    product={selectedProduct}
-                    transactionType={transactionType}
+                    disabled={disableProductSelect}
                 />
             )}
 
@@ -67,6 +62,13 @@ export default function RequestForm({
                 value={itemAmount}
                 onChange={onItemAmountChange}
             />
+            
+            {selectedProduct && (
+                <StockInfo
+                    product={selectedProduct}
+                    transactionType={transactionType}
+                />
+            )}
 
             <TransactionDatePicker
                 value={dateValue}

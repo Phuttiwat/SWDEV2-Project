@@ -5,7 +5,7 @@ import Image from "next/image";
 import { useSession } from "next-auth/react";
 
 export default function Banner() {
-    const cover = '/img/cover.png'
+    const cover = '/img/banner.jpg'
     const [index, setIndex] = useState(0)
     const router = useRouter()
     const { data: session } = useSession()
@@ -33,12 +33,6 @@ export default function Banner() {
                     View Products & Make Transaction Request 
                 </h3>
             </div>
-
-            {session && (
-                <div className="absolute top-4 right-4 z-30 font-semibold text-cyan-600 text-xl bg-white/80 rounded px-3 py-1">
-                    Welcome back, {session.user?.name}
-                </div>
-            )}
 
             <button
                 className="absolute bottom-4 right-4 z-30 bg-white text-cyan-600 border border-cyan-600 font-semibold py-3 px-5 rounded hover:bg-cyan-600 hover:text-white"

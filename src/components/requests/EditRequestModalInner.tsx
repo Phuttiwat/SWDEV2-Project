@@ -9,9 +9,17 @@ type Props = {
     requestId: string;
     modalRoot: HTMLElement;
     onClose: () => void;
+    onSuccess?: () => void;
 };
 
-export default function EditRequestModalInner({ requestId, modalRoot, onClose }: Props) {
+export default function EditRequestModalInner({ requestId, modalRoot, onClose, onSuccess }: Props) {
+
+    const handleEditSuccess = () => {
+        if (onSuccess) {
+            onSuccess();
+        }
+        onClose();
+    };
 
     const {
         transactionType,
@@ -30,7 +38,7 @@ export default function EditRequestModalInner({ requestId, modalRoot, onClose }:
         handleItemAmountChange,
         handleTransactionDateChange,
         handleSubmit,
-    } = useEditRequestForm(requestId);
+    } = useEditRequestForm(requestId, handleEditSuccess);
 
     // Note: modal overlay + dialog markup -- displayed inside createPortal by parent
     return (

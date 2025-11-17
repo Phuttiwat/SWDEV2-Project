@@ -1,7 +1,7 @@
 import { Select, MenuItem } from "@mui/material";
 import { ProductSelectProps } from "../../../interface";
 
-export default function ProductSelect({ products, value, onChange }: ProductSelectProps) {
+export default function ProductSelect({ products, value, onChange, disabled = false }: ProductSelectProps) {
     return (
         <Select
             variant="standard"
@@ -11,6 +11,7 @@ export default function ProductSelect({ products, value, onChange }: ProductSele
             displayEmpty
             value={value}
             onChange={(e) => onChange(e.target.value)}
+            disabled={disabled}
             MenuProps={{
                 container: typeof document !== "undefined" ? document.body : undefined,
                 PaperProps: {

@@ -1,5 +1,5 @@
 import { ProductResponse } from "../../../interface";
-import Card from "../Card";
+import ProductCard from "./ProductCard";
 import Link from "next/link";
 
 import { getServerSession } from "next-auth";
@@ -32,6 +32,7 @@ export default async function ProductCatalog(props: {
     await deleteProduct(id, token);
 
     revalidatePath("/product");
+    revalidatePath("/request");
   }
 
   const successMessage =
@@ -45,66 +46,78 @@ export default async function ProductCatalog(props: {
     <>
       {successMessage && <SuccessPopup message={successMessage} />}
 
-      <div className="p-5">
-        <div className="font-medium text-2xl text-center mb-4">
-          Select your product
-        </div>
-        <div className="text-lg text-center mb-6">
-          Explore {count} products in our catalog
-        </div>
-      </div>
-
-      <div className="m-5 flex flex-row flex-wrap justify-around items-center">
-  {data.map((product) => {
-    if (!product._id && !product.sku) return null;
-
-    const adminActions = isAdmin ? (
-      <div className=" flex gap-2">
-        {/* Edit */}
-        <Link
-          href={`/product/manage?id=${product._id}`}
-          className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded-md text-sm inline-flex items-center justify-center"
-        >
-          Edit
-        </Link>
-
-        {/* Delete */}
-        <form action={deleteProductAction}>
-          <input type="hidden" name="id" value={String(product._id)} />
-          <button
-            type="submit"
-            className="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded-md text-sm inline-flex items-center justify-center"
-          >
-            Delete
-          </button>
-        </form>
-      </div>
-    ) : null;
-
-    return (
-      <div
-        key={product._id ?? product.sku}
-        className="w-1/3 flex flex-col items-stretch p-2"
-      >
-        <div className="flex flex-col">
-          <Link href={`/product/${product._id}`} className="block">
-            <Card
-              venueName={product.name}
-              imgSrc={product.picture}
-              actionButtons={null}
-            />
-          </Link>
-          {adminActions && (
-            <div className="mt-2 flex justify-end">
-              {adminActions}
-            </div>
-          )}
+      {/* Header Section */}
+      <div className="bg-gradient-to-r from-blue-50 to-indigo-50 py-12 px-5 mb-8">
+        <div className="max-w-7xl mx-auto">
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex-1"></div>
+            {isAdmin && (
+              <Link
+                href="/product/manage"
+                className="inline-flex items-center justify-center gap-2 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-semibold py-2.5 px-6 rounded-lg shadow-lg transition-all duration-200 transform hover:scale-105 hover:shadow-xl"
+              >
+                <svg
+                  className="w-5 h-5"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M12 4v16m8-8H4"
+                  />
+                </svg>
+                New Product
+              </Link>
+            )}
+          </div>
+          <div className="text-center">
+            <h1 className="text-4xl font-bold text-gray-800 mb-3">
+              Product Catalog
+            </h1>
+            <p className="text-lg text-gray-600">
+              Explore our collection of <span className="font-semibold text-indigo-600">{count}</span> products
+            </p>
+          </div>
         </div>
       </div>
-    );
-  })}
-</div>
 
+      {/* Products Grid */}
+      <div className="max-w-7xl mx-auto px-5 pb-10">
+        {data.length === 0 ? (
+          <div className="text-center py-20">
+            <div className="text-gray-400 text-6xl mb-4">📦</div>
+            <p className="text-xl text-gray-600">No products available</p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {data.map((product) => {
+              if (!product._id && !product.sku) return null;
+
+              return (
+                <div
+                  key={product._id ?? product.sku}
+                  className="flex flex-col items-stretch"
+                >
+                  <ProductCard
+                    productId={String(product._id)}
+                    productName={product.name}
+                    productImage={product.picture}
+                    isAdmin={isAdmin}
+                    deleteProductAction={deleteProductAction}
+                    sku={product.sku}
+                    stockQuantity={product.stockQuantity}
+                    unit={product.unit}
+                  />
+                </div>
+              );
+            })}
+          </div>
+        )}
+      </div>
     </>
   );
 }
