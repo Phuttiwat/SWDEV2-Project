@@ -4,9 +4,10 @@ import { getProductById } from "@/libs/Product";
 export default async function ManageProductPage({
   searchParams,
 }: {
-  searchParams: { id?: string; success?: string };
+  searchParams: Promise<{ id?: string; success?: string }>;
 }) {
-  const id = searchParams.id;
+  const resolvedSearchParams = await searchParams;
+  const id = resolvedSearchParams.id;
   let product: any = null;
 
   if (id) {

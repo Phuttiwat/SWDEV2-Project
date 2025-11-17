@@ -1,7 +1,7 @@
 import Image from "next/image";
 import { getProductById, deleteProduct } from "@/libs/Product";
 import { getServerSession } from "next-auth";
-import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import { authOptions } from "@/app/api/auth/[...nextauth]/authOptions";
 import getUserRole from "@/libs/getUserRole";
 import ProductDetailMenu from "@/components/products/ProductDetailMenu";
 import ProductRequestButton from "@/components/products/ProductRequestButton";

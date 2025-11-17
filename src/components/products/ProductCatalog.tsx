@@ -3,7 +3,7 @@ import ProductCard from "./ProductCard";
 import Link from "next/link";
 
 import { getServerSession } from "next-auth";
-import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import { authOptions } from "@/app/api/auth/[...nextauth]/authOptions";
 import { deleteProduct } from "@/libs/Product";
 import { revalidatePath } from "next/cache";
 import SuccessPopup from "./SuccessPopup";

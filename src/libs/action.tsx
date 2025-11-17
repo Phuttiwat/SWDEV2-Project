@@ -1,11 +1,17 @@
 "use server";
 
 import { getServerSession } from "next-auth";
-import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import { authOptions } from "@/app/api/auth/[...nextauth]/authOptions";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
-
-import { addProduct, updateProduct } from "@/libs/Product";
+import {
+  addProduct,
+  updateProduct,
+} from "@/libs/Product";
+import {
+  UpdateProductPayload,
+  CreateProductPayload,
+} from "../../interface";
 
 export async function handleSubmitProduct(formData: FormData) {
   const id = formData.get("id") as string | null;
@@ -25,6 +31,10 @@ export async function handleSubmitProduct(formData: FormData) {
   const session = await getServerSession(authOptions);
   const token = session?.user?.token;
 
+
+  console.log("🚀 handleSubmitProduct payload:", payload);
+  console.log("🚀 token:", token);
+
   try {
     if (id) {
       await updateProduct(id, payload, token);
@@ -33,14 +43,14 @@ export async function handleSubmitProduct(formData: FormData) {
     }
   } catch (error) {
     console.error(error);
-    return; 
+    return;
   }
 
-  revalidatePath("/products");
+  revalidatePath("/product");
 
   if (id) {
-    redirect(`/product?success=updated`);
+    redirect("/product");
   } else {
-    redirect(`/product?success=created`);
+    redirect("/product/manage?success=1");
   }
 }

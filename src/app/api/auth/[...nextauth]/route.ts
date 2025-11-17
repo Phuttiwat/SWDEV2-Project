@@ -7,4 +7,4 @@ if (typeof NextAuth === "function") {
 } else {
     handler = async (req: any, res: any) => res.status(200).end();
 }
-export { handler as GET, handler as POST, authOptions };
+export { handler as GET, handler as POST };

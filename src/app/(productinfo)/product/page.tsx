@@ -1,7 +1,7 @@
 import ProductCatalog from "@/components/products/ProductCatalog";
 import { getProducts } from "@/libs/Product";
 import { getServerSession } from "next-auth";
-import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import { authOptions } from "@/app/api/auth/[...nextauth]/authOptions";
 import Footer from "@/components/Footer";
 
 export default async function Venue({
